@@ -7,7 +7,6 @@ import '../../config/app_config.dart';
 import '../../widgets/modern_widgets.dart';
 import 'enhanced_registration_screen.dart';
 import 'forgot_password_screen.dart';
-import '../../widgets/google_signin_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -219,82 +218,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ).animate().fadeIn(delay: 500.ms).scale(),
-
-                    const SizedBox(height: 40),
-
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: ThemeConfig.borderColor,
-                            thickness: 1,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('OR', style: ThemeConfig.bodySmall),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: ThemeConfig.borderColor,
-                            thickness: 1,
-                          ),
-                        ),
-                      ],
-                    ).animate().fadeIn(delay: 600.ms),
-
-                    const SizedBox(height: 24),
-
-                    // Google Sign-In Button
-                    GoogleSignInButton(
-                      onSuccess: (vendorData) {
-                        // Check approval status
-                        final user = vendorData['user'];
-                        // Safe check for is_approved (handle int or bool or string)
-                        bool isApproved = false;
-                        if (user['is_approved'] == 1 ||
-                            user['is_approved'] == '1' ||
-                            user['is_approved'] == true) {
-                          isApproved = true;
-                        }
-
-                        if (isApproved) {
-                          if (mounted) {
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/dashboard',
-                            );
-                          }
-                        } else {
-                          if (mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Account Pending'),
-                                content: const Text(
-                                  'Your vendor account is waiting for admin approval.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      onError: (error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(error),
-                            backgroundColor: ThemeConfig.errorColor,
-                          ),
-                        );
-                      },
-                    ).animate().fadeIn(delay: 650.ms),
 
                     const SizedBox(height: 30),
 

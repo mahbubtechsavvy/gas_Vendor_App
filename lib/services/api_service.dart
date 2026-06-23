@@ -189,7 +189,7 @@ class ApiService {
     try {
       FormData formData = FormData.fromMap({
         fieldName: await MultipartFile.fromFile(filePath),
-        if (additionalData != null) ...additionalData,
+        ...?additionalData,
       });
 
       final response = await _dio.post(endpoint, data: formData);

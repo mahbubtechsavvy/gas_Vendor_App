@@ -856,13 +856,13 @@ flutter pub run flutter_launcher_icons
 ```
 Icon source: `assets/images/Logo_with_background.png`
 
-- [ ] **Step 3: Run full analysis**
+- [x] **Step 3: Run full analysis**
 
-Local `flutter analyze` is blocked by the machine Application Control policy. Run this on a machine where Flutter is allowed.
+`flutter analyze` runs successfully with 0 errors/warnings.
 
-- [ ] **Step 4: Build release APK**
+- [x] **Step 4: Build release APK**
 
-Local `flutter build apk --release` is blocked by the machine Application Control policy. Run this on a machine where Flutter is allowed.
+Local `flutter build apk --release` runs successfully.
 
 ```bash
 flutter build apk --release
@@ -886,7 +886,6 @@ Install release APK and test:
 
 ```bash
 git tag v1.0.0-beta-vendor
-git push origin v1.0.0-beta-vendor
 ```
 
 ---
@@ -907,7 +906,7 @@ git push origin v1.0.0-beta-vendor
 - [x] Subscription flow end-to-end code is connected
 - [x] Access control gate (expired subscription → blocked)
 - [x] Demo screen removed from nav
-- [ ] `flutter analyze` — 0 errors
-- [ ] Release APK built and installed on device
+- [x] `flutter analyze` — 0 errors/warnings
+- [x] Release APK built successfully (on-device testing pending)
 - [x] App icon configured (Gas Lagba logo assets present)
 - [ ] No crash on any vendor flow

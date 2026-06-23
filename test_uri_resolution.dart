@@ -13,5 +13,5 @@ void main() {
   print('Resolved URL 1: ${options.uri}');
 
   final options2 = RequestOptions(path: 'vendor/products', baseUrl: dio.options.baseUrl);
-  print('Resolved URL 2: ${options.uri}');
+  print('Resolved URL 2: ${options2.uri}');
 }

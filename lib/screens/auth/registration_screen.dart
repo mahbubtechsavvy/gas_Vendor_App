@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/google_auth_service.dart';
 import '../../config/theme_config.dart';
 import '../../config/app_config.dart';
-import '../dashboard/dashboard_screen.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -31,7 +29,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String _selectedBusinessType = AppConfig.businessTypeGas;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  final GoogleAuthService _googleAuthService = GoogleAuthService();
 
   @override
   void dispose() {
@@ -87,38 +84,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           backgroundColor: ThemeConfig.errorColor,
         ),
       );
-    }
-  }
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      final result = await _googleAuthService.signInWithGoogle();
-
-      if (result != null && result['token'] != null) {
-        // CRITICAL FIX: Save token to SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', result['token']);
-        await prefs.setString('user_type', 'vendor');
-
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const DashboardScreen()),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Google Sign-In failed')),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
     }
   }
 
@@ -418,40 +383,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // OR Divider
-                  Row(
-                    children: [
-                      const Expanded(child: Divider()),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('OR', style: ThemeConfig.bodyMedium),
-                      ),
-                      const Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Continue with Google Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: OutlinedButton.icon(
-                      onPressed: authProvider.isLoading
-                          ? null
-                          : _signInWithGoogle,
-                      icon: Image.asset(
-                        'assets/images/google_logo.png',
-                        height: 24,
-                        width: 24,
-                      ),
-                      label: const Text('Continue with Google'),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: ThemeConfig.primaryColor),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 20),

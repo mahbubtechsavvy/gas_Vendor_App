@@ -108,7 +108,7 @@ class _BusinessAnalyticsScreenState extends State<BusinessAnalyticsScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, color: ThemeConfig.errorColor, size: 48),
+                Icon(Icons.error_outline, color: ThemeConfig.errorColor, size: 48),
                 const SizedBox(height: ThemeConfig.spaceLG),
                 Text('Could not load analytics', style: ThemeConfig.heading3),
                 const SizedBox(height: ThemeConfig.spaceSM),

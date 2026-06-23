@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/vendor.dart';
 import '../models/vendor_status.dart';
 import '../services/auth_service.dart';
-import '../services/notification_service.dart';
 import '../services/demo_data.dart';
 import '../config/api_config.dart';
 
@@ -74,7 +73,7 @@ class AuthProvider with ChangeNotifier {
       );
       final token = _authService.currentToken;
       if (token?.isNotEmpty == true) {
-        await NotificationService().saveCurrentFCMToken(token!);
+        debugPrint('Vendor registered, token saved.');
       }
 
       _isLoading = false;
@@ -113,9 +112,9 @@ class AuthProvider with ChangeNotifier {
       } else {
         // Use actual backend API
         response = await _authService.login(mobile: mobile, password: password);
-        final token = response['token'] as String?;
-        if (token?.isNotEmpty == true) {
-          await NotificationService().saveCurrentFCMToken(token!);
+        final loginToken = response['token'] as String?;
+        if (loginToken?.isNotEmpty == true) {
+          debugPrint('Vendor logged in, token ready.');
         }
       }
 

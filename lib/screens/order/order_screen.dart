@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/order_provider.dart';
@@ -13,6 +14,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   String _selectedFilter = 'All';
+  Timer? _pollingTimer;
   final List<String> _filters = [
     'All',
     'Pending',
@@ -26,6 +28,17 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     _loadOrders();
+    // Auto-refresh every 20 seconds so vendor sees new orders without pulling
+    _pollingTimer = Timer.periodic(
+      const Duration(seconds: 20),
+      (_) => _loadOrders(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadOrders() async {

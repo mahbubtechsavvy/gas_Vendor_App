@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'config/theme_config.dart';
 import 'services/storage_service.dart';
-import 'services/notification_service.dart';
 import 'providers/auth_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/product_provider.dart';
@@ -24,20 +21,8 @@ void main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Initialize Firebase with platform-specific options
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-
     // Initialize Storage Service
     await StorageService().init();
-
-    // Initialize Notification Service
-    try {
-      await NotificationService().initialize();
-    } catch (e) {
-      debugPrint('Notification service initialization skipped: $e');
-    }
 
     runApp(const MyApp());
   } catch (e, stackTrace) {
