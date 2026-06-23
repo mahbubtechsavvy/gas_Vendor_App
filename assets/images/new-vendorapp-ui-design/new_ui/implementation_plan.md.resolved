@@ -1,0 +1,178 @@
+# New Subscription UI Design Implementation
+
+Implement the new subscription management UI as shown in the 9 design images, updating both the **Vendor App (Flutter)** and **Admin Panel (PHP)**.
+
+## Proposed Changes
+
+### Database Schema Migration
+
+#### [NEW] [migration_subscription_ui_v2.sql](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/database/migration_subscription_ui_v2.sql)
+
+Add new columns to the `subscriptions` table required by the new UI:
+
+```sql
+ALTER TABLE subscriptions
+  ADD COLUMN duration_months INT DEFAULT 0 AFTER duration_days,
+  ADD COLUMN plan_session_year VARCHAR(20) DEFAULT NULL AFTER duration_months,
+  ADD COLUMN promo_code VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN promo_text VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN plan_title VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN recommended TINYINT(1) DEFAULT 0,
+  ADD COLUMN terms_link VARCHAR(500) DEFAULT NULL,
+  ADD COLUMN box_color VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN box_border_color VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN text_color VARCHAR(50) DEFAULT NULL,
+  ADD COLUMN plan_icon VARCHAR(50) DEFAULT 'crown',
+  ADD COLUMN feature_included TEXT DEFAULT NULL COMMENT 'JSON array of included feature indices';
+```
+
+---
+
+### Admin Panel – Subscription Model
+
+#### [MODIFY] [Subscription.php](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/models/Subscription.php)
+
+- Add new public properties: `$duration_months`, `$plan_session_year`, `$promo_code`, `$promo_text`, `$plan_title`, `$recommended`, `$terms_link`, `$box_color`, `$box_border_color`, `$text_color`, `$plan_icon`, `$feature_included`
+- Update [create()](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/models/Subscription.php#70-121) and [update()](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/models/Subscription.php#122-177) methods to include the new columns
+- Add column-existence checking for backward compatibility
+
+---
+
+### Admin Panel – Subscription Plans Page
+
+#### [MODIFY] [subscriptions.php](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/admin/subscriptions.php)
+
+Complete rewrite to match the new design:
+
+**Plan Cards Grid:**
+- Each plan shown as a color-coded card with its own border color (matching the design: pink for Go Plan, light blue for Up Plan, orange for Prime Plan, red/green for inactive plans)
+- Active/Inactive status badge in top-right corner
+- Plan name styled in italic bold with unique color per plan
+- Details: Plan Name, Price (৳), Duration (Month), Plan Session Year
+- Action buttons: Edit, Disable/Enable, Delete
+
+**Edit Plan Modal (large, `modal-xl`):**
+- Left column: Edit form (Plan Name, Duration Month, Price, Plan Session Year, Promo Code, Promo Text, Plan Title, Features as numbered list with ✓/✗ toggle, Recommended toggle, Terms Link)
+- Right column: Live preview showing exactly how the plan card would look in the vendor app
+- Bottom section: Color Settings (Box Color, Text Color, Recommended Box/Text Color, Promo colors)
+- Close + Update Plan buttons
+
+**Add Plan Modal** updated similarly.
+
+---
+
+### API – Get Plans Endpoint
+
+#### [MODIFY] [get_plans.php](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/api/v1/subscription/get_plans.php)
+
+Return the new fields:
+- `duration_months`, `plan_session_year`, `promo_code`, `promo_text`, `plan_title`, `recommended`
+- `terms_link`, `box_color`, `box_border_color`, `text_color`, `plan_icon`
+- `feature_included` (JSON array of which features are "included" vs "not included")
+
+---
+
+### API – Vendor Subscription Info
+
+#### [NEW] [get_vendor_subscription.php](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/adminpanel/api/v1/subscription/get_vendor_subscription.php)
+
+New endpoint (requires JWT auth) that returns:
+- Current vendor's active subscription details (plan name, start/end date, status: Active/Expired/Pending/None)
+- Shop name, vendor unique ID, duration months, plan session year
+- Monthly progress calculation
+
+---
+
+### Vendor App – Subscription Plan Model
+
+#### [MODIFY] [subscription_plan.dart](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/vendorapp/lib/models/subscription_plan.dart)
+
+Add new fields matching the design:
+- `durationMonths`, `planSessionYear`, `promoCode`, `promoText`, `planTitle`
+- `recommended`, `termsLink`, `boxColor`, `boxBorderColor`, `textColor`, `planIcon`
+- `featureIncluded` (list of booleans marking ✓ vs ✗ per feature)
+- Update `fromJson()` and [toJson()](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/vendorapp/lib/models/vendor.dart#95-120) accordingly
+
+---
+
+### Vendor App – Subscription Service
+
+#### [MODIFY] [subscription_service.dart](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/vendorapp/lib/services/subscription_service.dart)
+
+- Add `getVendorSubscription()` method that calls the new API endpoint
+- Returns vendor's current subscription info (status, plan details, expiry, etc.)
+
+---
+
+### Vendor App – Subscription Screen (Complete Rewrite)
+
+#### [MODIFY] [subscription_screen.dart](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/vendorapp/lib/screens/subscription/subscription_screen.dart)
+
+Complete rewrite to match the 7 vendor app design images:
+
+**Vendor Subscription Status Card (top):**
+- Shows shop name, vendor ID, plan name, duration, plan expired date, plan session year
+- Status badge: Active (green), Expired (red), Pending (orange)
+- Monthly progress bar (1-12 months with filled/unfilled indicators)
+- "GAS LAGBE TERMS AND CONDITIONS" link
+
+**Plan Selector Section:**
+- 3 expandable plan cards: Go Plan, Up Plan, Prime Plan
+- Each card styled as a rounded pill button with arrow icon
+- "RECOMMENDED" badge on featured plan
+- Tapping expands to show plan details:
+  - Plan Name, Price (৳), Duration (Month), Plan Session Year
+  - VIP icon for premium plans
+  - Plan title: "What you have in [Plan Name]?"
+  - Feature list with ✓ (green check for included) and ✗ (grey X for not included)
+  - Promo offer text with promo code display + copy button
+  - Terms link
+
+**Conditional States:**
+- Active: Normal view with plan details
+- Expired: Red status + "Your Plan Is Expired Buy A New Plan…" warning
+- Pending: "New Vendor! Buy a Plan to Active Gas Lagbe Vendor App"
+
+**Bottom:**
+- Pay button (full width, dark blue)
+- Support button (pill shaped, with bot icon)
+- Bottom navigation bar (Dashboard, Orders, Products, Profile)
+
+---
+
+### Vendor App – Payment Submit Screen
+
+#### [MODIFY] [payment_submit_screen.dart](file:///d:/flutter%20project/Gas%20User%20and%20Vendor%20App/vendorapp/lib/screens/subscription/payment_submit_screen.dart)
+
+Update styling to match the new design (blue gradient card header showing plan name, form fields with lock icons for read-only fields, matching color scheme).
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+1. **Flutter analyze** — Run `flutter analyze` in the vendorapp directory to ensure no compilation errors:
+   ```bash
+   cd "d:\flutter project\Gas User and Vendor App\vendorapp"
+   flutter analyze --no-pub
+   ```
+
+### Manual Verification
+
+> [!IMPORTANT]
+> Since this project connects to a live PHP backend, full end-to-end testing requires the server to be running. The following manual checks are recommended:
+
+1. **Admin Panel**: After deploying the updated PHP files, open Subscription Plans page and verify:
+   - Plan cards display with color-coded borders
+   - Edit modal shows live preview on the right
+   - Color settings section appears at bottom of edit modal
+   - Adding/editing/deleting plans works correctly
+
+2. **Vendor App**: Build the APK and test on device:
+   - Subscription screen shows vendor status card with correct status
+   - Plan cards expand/collapse correctly
+   - Feature list shows ✓/✗ icons correctly
+   - Promo code displays and copy button works
+   - Pay navigates to payment screen with correct plan data
+   - Payment form fields auto-fill from vendor profile
