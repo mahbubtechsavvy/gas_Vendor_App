@@ -1,128 +1,160 @@
 import 'package:flutter/material.dart';
-import '../../config/theme_config.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/i18n/locale_provider.dart';
+import '../../core/theme/app_theme.dart';
+import '../../providers/branch_provider.dart';
+import '../../providers/vendor_auth_provider.dart';
+import '../../widgets/custom_button.dart';
+import '../dashboard/vendor_main_navigation_shell.dart';
+import 'email_entry_screen.dart';
 
-class PendingApprovalScreen extends StatelessWidget {
+class PendingApprovalScreen extends StatefulWidget {
   const PendingApprovalScreen({super.key});
 
   @override
+  State<PendingApprovalScreen> createState() => _PendingApprovalScreenState();
+}
+
+class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
+  bool _isChecking = false;
+
+  void _checkStatus() async {
+    setState(() => _isChecking = true);
+    final auth = context.read<VendorAuthProvider>();
+    final branchProv = context.read<BranchProvider>();
+
+    await auth.fetchProfiles();
+    if (!mounted) return;
+    setState(() => _isChecking = false);
+
+    if (auth.vendorProfile?.status.isApproved == true) {
+      await branchProv.fetchBranches();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.read<LocaleProvider>().isBangla
+                ? 'আপনার আবেদনটি এখনও পর্যালোচনাধীন রয়েছে।'
+                : 'Your application is still under review by our admin team.',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final loc = context.watch<LocaleProvider>();
+    final auth = context.watch<VendorAuthProvider>();
+    final vendor = auth.vendorProfile;
+
     return Scaffold(
-      backgroundColor: ThemeConfig.backgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: ThemeConfig.warningColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.hourglass_top_rounded,
-                size: 80,
-                color: ThemeConfig.warningColor,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              'Application Pending',
-              style: ThemeConfig.heading1,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Your vendor application is currently under review. This process typically takes up to 72 hours.',
-              style: ThemeConfig.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: ThemeConfig.borderColor),
-              ),
-              child: Column(
-                children: [
-                  _buildStep(
-                    icon: Icons.check_circle,
-                    color: ThemeConfig.successColor,
-                    title: 'Registration Submitted',
-                    isCompleted: true,
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.warningLight,
+                    shape: BoxShape.circle,
                   ),
-                  _buildConnector(isCompleted: true),
-                  _buildStep(
-                    icon: Icons.admin_panel_settings,
-                    color: ThemeConfig.warningColor,
-                    title: 'Admin Review',
-                    isCompleted: false,
-                    isActive: true,
+                  child: const Icon(
+                    Icons.hourglass_top_rounded,
+                    size: 72,
+                    color: AppTheme.warning,
                   ),
-                  _buildConnector(isCompleted: false),
-                  _buildStep(
-                    icon: Icons.store_mall_directory,
-                    color: ThemeConfig.textLight,
-                    title: 'Start Selling',
-                    isCompleted: false,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  loc.isBangla ? 'আবেদন পর্যালোচনাধীন রয়েছে' : 'Application Under Review',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
                   ),
-                ],
-              ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  loc.isBangla
+                      ? 'আপনার ভেন্ডর পার্টনার আবেদনটি গ্যাস লাগবে অ্যাডমিন টিম যাচাই করছে। অনুমোদন সম্পন্ন হলে অ্যাপের সম্পূর্ণ অ্যাক্সেস পেয়ে যাবেন।'
+                      : 'Our operations team is verifying your business documents. You will get full access once approved.',
+                  style: const TextStyle(fontSize: 14, color: AppTheme.textSecondary),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+
+                if (vendor != null)
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            vendor.businessName,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Trade License: ${vendor.tradeLicenseNo}',
+                            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                          ),
+                          Text(
+                            'Email: ${vendor.contactEmail}',
+                            style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                const SizedBox(height: 28),
+
+                CustomButton(
+                  text: loc.isBangla ? 'স্ট্যাটাস যাচাই করুন' : 'Refresh Status',
+                  icon: Icons.refresh,
+                  isLoading: _isChecking,
+                  onPressed: _checkStatus,
+                ),
+                const SizedBox(height: 12),
+                CustomButton(
+                  text: loc.isBangla ? 'সাপোর্ট হেল্পলাইনে কল করুন' : 'Contact Support',
+                  icon: Icons.headset_mic_outlined,
+                  isOutlined: true,
+                  onPressed: () => launchUrl(Uri.parse('tel:+8801700000000')),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () async {
+                    await auth.logout();
+                    if (!context.mounted) return;
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const EmailEntryScreen()),
+                      (route) => false,
+                    );
+                  },
+                  child: Text(
+                    loc.tr('logout'),
+                    style: const TextStyle(color: AppTheme.danger, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 48),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/login');
-              },
-              child: const Text('Back to Login'),
-            ),
-          ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStep({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required bool isCompleted,
-    bool isActive = false,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(width: 16),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive
-                ? ThemeConfig.textPrimary
-                : ThemeConfig.textSecondary,
-          ),
-        ),
-        if (isActive) ...[
-          const Spacer(),
-          const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildConnector({required bool isCompleted}) {
-    return Container(
-      margin: const EdgeInsets.only(left: 11, top: 4, bottom: 4),
-      height: 24,
-      width: 2,
-      color: isCompleted ? ThemeConfig.successColor : ThemeConfig.borderColor,
     );
   }
 }
