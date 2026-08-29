@@ -59,7 +59,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
     if (!mounted) return;
 
     if (success) {
-      if (auth.vendorProfile?.status.isPending == true) {
+      if (auth.vendorProfile == null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const VendorRegisterScreen()),
+          (route) => false,
+        );
+      } else if (auth.vendorProfile?.status.isPending == true) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const PendingApprovalScreen()),
           (route) => false,

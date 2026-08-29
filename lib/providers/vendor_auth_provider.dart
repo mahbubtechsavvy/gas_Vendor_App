@@ -72,8 +72,7 @@ class VendorAuthProvider extends ChangeNotifier {
         ApiEndpoints.verifyOtp,
         body: {
           'email': _pendingEmail,
-          'otp': otp.trim(),
-          'appType': 'VENDOR',
+          'code': otp.trim(),
         },
       );
 

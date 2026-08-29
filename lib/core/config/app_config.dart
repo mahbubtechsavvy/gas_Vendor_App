@@ -5,23 +5,12 @@ class AppConfig {
   static const String appName = 'Gas Lagba Vendor';
   static const String appVersion = '1.0.0';
 
-  // Base API configuration with emulator & production support
+  // Base API configuration with live production support
   static String get apiBaseUrl {
-    if (kReleaseMode) {
-      return const String.fromEnvironment(
-        'API_BASE_URL',
-        defaultValue: 'https://api.gaslagba.com/api/v1',
-      );
-    }
-
     const envUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
     if (envUrl.isNotEmpty) return envUrl;
 
-    if (!kIsWeb && Platform.isAndroid) {
-      return 'http://10.0.2.2:3000/api/v1';
-    }
-
-    return 'http://localhost:3000/api/v1';
+    return 'https://gaslagbaapi.gtgroup.cloud/api/v1';
   }
 
   // Storage Keys

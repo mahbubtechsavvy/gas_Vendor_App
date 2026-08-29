@@ -122,7 +122,7 @@ class _EmailEntryScreenState extends State<EmailEntryScreen> {
                       if (val == null || val.trim().isEmpty) {
                         return 'Please enter your business email';
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
+                      if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val.trim())) {
                         return 'Please enter a valid email address';
                       }
                       return null;
@@ -144,9 +144,21 @@ class _EmailEntryScreenState extends State<EmailEntryScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const VendorRegisterScreen()),
-                          );
+                          if (_emailController.text.trim().isNotEmpty &&
+                              RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(_emailController.text.trim())) {
+                            _submit();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  loc.isBangla
+                                      ? 'নিবন্ধন শুরু করতে উপরে আপনার ব্যবসায়িক ইমেল লিখুন এবং কোড পাঠান।'
+                                      : 'Enter your business email above and click Send OTP to start registration.',
+                                ),
+                                backgroundColor: AppTheme.primary,
+                              ),
+                            );
+                          }
                         },
                         child: Text(
                           loc.isBangla ? 'নিবন্ধন করুন' : 'Register Here',

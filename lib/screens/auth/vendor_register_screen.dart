@@ -27,6 +27,10 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
   @override
   void initState() {
     super.initState();
+    final auth = context.read<VendorAuthProvider>();
+    if (auth.pendingEmail != null) {
+      _emailController.text = auth.pendingEmail!;
+    }
     _districtController.text = 'Dhaka';
     _thanaController.text = 'Dhanmondi';
   }
@@ -48,6 +52,16 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final auth = context.read<VendorAuthProvider>();
+    if (!auth.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please sign in with your email OTP first to verify your identity.'),
+          backgroundColor: AppTheme.warning,
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
     final success = await auth.registerVendor(
       businessName: _businessNameController.text.trim(),
       tradeLicenseNo: _tradeLicenseController.text.trim(),
@@ -135,7 +149,7 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
                         ),
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return 'Required';
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
+                          if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val.trim())) {
                             return 'Enter a valid email';
                           }
                           return null;
