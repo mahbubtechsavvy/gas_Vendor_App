@@ -8,11 +8,21 @@ class SubscriptionProvider extends ChangeNotifier {
 
   List<SubscriptionPlanModel> _plans = [];
   VendorSubscriptionModel? _currentSubscription;
+  Map<String, String> _paymentChannels = {
+    'bkash': '01644274016',
+    'nagad': '01644274016',
+    'rocket': '01644274016-8',
+    'bank': 'City Bank | A/C: 1102938475 | GT Group',
+  };
   bool _isLoading = false;
   String? _error;
 
   List<SubscriptionPlanModel> get plans => _plans;
   VendorSubscriptionModel? get currentSubscription => _currentSubscription;
+  String get bkashNumber => _paymentChannels['bkash'] ?? '01644274016';
+  String get nagadNumber => _paymentChannels['nagad'] ?? '01644274016';
+  String get rocketNumber => _paymentChannels['rocket'] ?? '01644274016-8';
+  String get bankDetails => _paymentChannels['bank'] ?? 'City Bank | A/C: 1102938475 | GT Group';
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -27,6 +37,15 @@ class SubscriptionProvider extends ChangeNotifier {
         _plans = plansRes.map((e) => SubscriptionPlanModel.fromJson(e)).toList();
       } else if (plansRes is Map<String, dynamic> && plansRes['plans'] is List) {
         _plans = (plansRes['plans'] as List).map((e) => SubscriptionPlanModel.fromJson(e)).toList();
+      }
+
+      try {
+        final chanRes = await _client.get(ApiEndpoints.paymentChannels);
+        if (chanRes is Map<String, dynamic>) {
+          _paymentChannels = chanRes.map((k, v) => MapEntry(k, v.toString()));
+        }
+      } catch (_) {
+        // Fallback to defaults
       }
 
       final subRes = await _client.get(ApiEndpoints.vendorSubscription);

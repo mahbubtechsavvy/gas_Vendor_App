@@ -7,7 +7,10 @@ import 'core/theme/app_theme.dart';
 import 'providers/branch_provider.dart';
 import 'providers/inventory_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/payout_method_provider.dart';
 import 'providers/payout_provider.dart';
+import 'providers/product_provider.dart';
+import 'providers/rider_delivery_provider.dart';
 import 'providers/rider_provider.dart';
 import 'providers/staff_provider.dart';
 import 'providers/subscription_provider.dart';
@@ -23,7 +26,10 @@ import 'screens/inventory/branch_inventory_screen.dart';
 import 'screens/notifications/vendor_notifications_screen.dart';
 import 'screens/order/vendor_orders_screen.dart';
 import 'screens/payouts/payout_ledger_screen.dart';
+import 'screens/payouts/vendor_payout_methods_screen.dart';
+import 'screens/products/products_screen.dart';
 import 'screens/profile/vendor_profile_screen.dart';
+import 'screens/rider/rider_home_screen.dart';
 import 'screens/riders/rider_management_screen.dart';
 import 'screens/staff/staff_management_screen.dart';
 import 'screens/subscription/subscription_screen.dart';
@@ -82,7 +88,10 @@ class VendorApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BranchProvider()),
         ChangeNotifierProvider(create: (_) => VendorOrderProvider()),
         ChangeNotifierProvider(create: (_) => InventoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => PayoutMethodProvider()),
         ChangeNotifierProvider(create: (_) => RiderProvider()),
+        ChangeNotifierProvider(create: (_) => RiderDeliveryProvider()),
         ChangeNotifierProvider(create: (_) => PayoutProvider()),
         ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (_) => StaffProvider()),
@@ -102,10 +111,13 @@ class VendorApp extends StatelessWidget {
               '/pending-approval': (context) => const PendingApprovalScreen(),
               '/dashboard': (context) => const VendorMainNavigationShell(),
               '/orders': (context) => const VendorOrdersScreen(),
+              '/products': (context) => const ProductsScreen(),
               '/inventory': (context) => const BranchInventoryScreen(),
               '/delivery-hours': (context) => const BranchDeliveryHoursScreen(),
               '/riders': (context) => const RiderManagementScreen(),
+              '/rider': (context) => const RiderHomeScreen(),
               '/payouts': (context) => const PayoutLedgerScreen(),
+              '/payout-methods': (context) => const VendorPayoutMethodsScreen(),
               '/subscription': (context) => const SubscriptionScreen(),
               '/staff': (context) => const StaffManagementScreen(),
               '/profile': (context) => const VendorProfileScreen(),

@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-
 class AppConfig {
   static const String appName = 'Gas Lagba Vendor';
   static const String appVersion = '1.0.0';

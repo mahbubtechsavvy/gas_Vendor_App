@@ -80,6 +80,7 @@ class _VendorOrderDetailScreenState extends State<VendorOrderDetailScreen> {
   void _showDispatchDialog(VendorOrderModel order) {
     final loc = context.read<LocaleProvider>();
     final riderProv = context.read<RiderProvider>();
+    String selectedMode = 'STAFF_RIDER'; // 'SELF', 'STAFF_RIDER', 'PLATFORM_RIDER'
     String? selectedRiderId = riderProv.riders.isNotEmpty ? riderProv.riders.first.id : null;
 
     showDialog(
@@ -87,42 +88,198 @@ class _VendorOrderDetailScreenState extends State<VendorOrderDetailScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           return AlertDialog(
-            title: Text(loc.tr('assignRider')),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
               children: [
-                if (riderProv.riders.isEmpty)
-                  Text(
-                    loc.isBangla ? 'কোনো রাইডার যুক্ত নেই। আপনি রাইডার ছাড়া সরাসরি পাঠাতে পারেন।' : 'No riders added yet. You can dispatch directly.',
-                    style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
-                  )
-                else
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedRiderId,
-                    decoration: const InputDecoration(labelText: 'Select Rider'),
-                    items: riderProv.riders.map((r) {
-                      return DropdownMenuItem(
-                        value: r.id,
-                        child: Text('${r.fullName} (${r.phone})'),
-                      );
-                    }).toList(),
-                    onChanged: (val) => setModalState(() => selectedRiderId = val),
-                  ),
+                const Icon(Icons.delivery_dining, color: AppTheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  loc.isBangla ? 'ডেলিভারি মাধ্যম নির্বাচন করুন' : 'Select Delivery Mode',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Option 1: Deliver Myself
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: selectedMode == 'SELF' ? AppTheme.primary : Colors.black12,
+                        width: selectedMode == 'SELF' ? 2 : 1,
+                      ),
+                    ),
+                    tileColor: selectedMode == 'SELF' ? AppTheme.primary.withValues(alpha: 0.05) : null,
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFFFECE5),
+                      child: Icon(Icons.person_pin_circle, color: AppTheme.primary, size: 20),
+                    ),
+                    title: Text(
+                      loc.isBangla ? 'আমি নিজেই ডেলিভার করব' : 'Deliver Myself (Owner)',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    subtitle: Text(
+                      loc.isBangla ? 'দোকানের মালিক সরাসরি গ্রাহককে ডেলিভার করবেন।' : 'Store owner delivers directly to customer.',
+                      style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                    ),
+                    trailing: Radio<String>(
+                      value: 'SELF',
+                      groupValue: selectedMode,
+                      activeColor: AppTheme.primary,
+                      onChanged: (val) => setModalState(() => selectedMode = val!),
+                    ),
+                    onTap: () => setModalState(() => selectedMode = 'SELF'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Option 2: Staff Rider
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: selectedMode == 'STAFF_RIDER' ? AppTheme.primary : Colors.black12,
+                        width: selectedMode == 'STAFF_RIDER' ? 2 : 1,
+                      ),
+                    ),
+                    tileColor: selectedMode == 'STAFF_RIDER' ? AppTheme.primary.withValues(alpha: 0.05) : null,
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFE3F2FD),
+                      child: Icon(Icons.groups, color: Colors.blue, size: 20),
+                    ),
+                    title: Text(
+                      loc.isBangla ? 'আমার দোকানের স্টাফ রাইডার' : 'My In-House Staff Rider',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.isBangla ? 'দোকানের নিয়োজিত রাইডারদের একজনকে দায়িত্ব দিন।' : 'Assign to an employed store rider.',
+                          style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                        ),
+                        if (selectedMode == 'STAFF_RIDER') ...[
+                          const SizedBox(height: 8),
+                          if (riderProv.riders.isEmpty)
+                            Text(
+                              loc.isBangla ? 'কোনো অনুমোদিত রাইডার নেই।' : 'No approved riders found.',
+                              style: const TextStyle(fontSize: 11, color: AppTheme.danger, fontWeight: FontWeight.bold),
+                            )
+                          else
+                            DropdownButtonFormField<String>(
+                              initialValue: selectedRiderId,
+                              isDense: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Select Staff Rider',
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(),
+                              ),
+                              items: riderProv.riders.map((r) {
+                                return DropdownMenuItem(
+                                  value: r.id,
+                                  child: Text('${r.fullName} (${r.phone})', style: const TextStyle(fontSize: 12)),
+                                );
+                              }).toList(),
+                              onChanged: (val) => setModalState(() => selectedRiderId = val),
+                            ),
+                        ],
+                      ],
+                    ),
+                    trailing: Radio<String>(
+                      value: 'STAFF_RIDER',
+                      groupValue: selectedMode,
+                      activeColor: AppTheme.primary,
+                      onChanged: (val) => setModalState(() => selectedMode = val!),
+                    ),
+                    onTap: () => setModalState(() => selectedMode = 'STAFF_RIDER'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Option 3: Request Gas Lagba Central Rider
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: selectedMode == 'PLATFORM_RIDER' ? Colors.purple : Colors.black12,
+                        width: selectedMode == 'PLATFORM_RIDER' ? 2 : 1,
+                      ),
+                    ),
+                    tileColor: selectedMode == 'PLATFORM_RIDER' ? Colors.purple.withValues(alpha: 0.05) : null,
+                    leading: const CircleAvatar(
+                      backgroundColor: Color(0xFFF3E5F5),
+                      child: Icon(Icons.rocket_launch, color: Colors.purple, size: 20),
+                    ),
+                    title: Text(
+                      loc.isBangla ? 'গ্যাস লাগবা সেন্ট্রাল রাইডার' : 'Request Gas Lagba Rider',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.purple),
+                    ),
+                    subtitle: Text(
+                      loc.isBangla
+                          ? 'অর্ডারটি গ্যাস লাগবা অন-ডিমান্ড রাইডার পুলে যুক্ত হবে।'
+                          : 'Broadcast to Gas Lagba on-demand platform riders.',
+                      style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                    ),
+                    trailing: Radio<String>(
+                      value: 'PLATFORM_RIDER',
+                      groupValue: selectedMode,
+                      activeColor: Colors.purple,
+                      onChanged: (val) => setModalState(() => selectedMode = val!),
+                    ),
+                    onTap: () => setModalState(() => selectedMode = 'PLATFORM_RIDER'),
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(loc.tr('cancel')),
               ),
-              CustomButton(
-                text: loc.tr('markDispatched'),
-                width: 140,
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: selectedMode == 'PLATFORM_RIDER' ? Colors.purple : AppTheme.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 onPressed: () async {
+                  if (selectedMode == 'STAFF_RIDER' && (selectedRiderId == null || riderProv.riders.isEmpty)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select an in-house staff rider or choose another option.')),
+                    );
+                    return;
+                  }
+
                   Navigator.pop(ctx);
                   final orderProv = context.read<VendorOrderProvider>();
-                  await orderProv.dispatchOrder(order.id, riderId: selectedRiderId);
+                  final ok = await orderProv.dispatchOrder(
+                    order.id,
+                    riderId: selectedMode == 'STAFF_RIDER' ? selectedRiderId : null,
+                    deliveryType: selectedMode,
+                  );
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          ok
+                              ? (selectedMode == 'PLATFORM_RIDER'
+                                  ? 'Gas Lagba rider requested! Broadcasted to platform.'
+                                  : 'Order dispatched successfully!')
+                              : (orderProv.error ?? 'Failed to dispatch order'),
+                        ),
+                        backgroundColor: ok ? AppTheme.success : AppTheme.danger,
+                      ),
+                    );
+                  }
                 },
+                child: Text(
+                  selectedMode == 'PLATFORM_RIDER'
+                      ? (loc.isBangla ? 'রিকোয়েস্ট পাঠান' : 'Request Rider')
+                      : loc.tr('markDispatched'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           );

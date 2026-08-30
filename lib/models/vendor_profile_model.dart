@@ -23,8 +23,15 @@ enum VendorStatus {
 
 class VendorProfileModel {
   final String id;
+  final String? uniqueCode;
+  final String legalName;
   final String businessName;
   final String tradeLicenseNo;
+  final String? nidNo;
+  final String? nidPhotoKey;
+  final String? nidPhotoUrl;
+  final String? logoKey;
+  final String? logoUrl;
   final String contactPhone;
   final String contactEmail;
   final VendorStatus status;
@@ -33,8 +40,15 @@ class VendorProfileModel {
 
   VendorProfileModel({
     required this.id,
+    this.uniqueCode,
+    required this.legalName,
     required this.businessName,
     required this.tradeLicenseNo,
+    this.nidNo,
+    this.nidPhotoKey,
+    this.nidPhotoUrl,
+    this.logoKey,
+    this.logoUrl,
     required this.contactPhone,
     required this.contactEmail,
     required this.status,
@@ -43,18 +57,29 @@ class VendorProfileModel {
   });
 
   factory VendorProfileModel.fromJson(Map<String, dynamic> json) {
-    String businessName = json['businessName'] ?? json['legalName'] ?? '';
+    String legalName = json['legalName'] ?? '';
+    String businessName = json['businessName'] ?? legalName;
     if (businessName.isEmpty && json['displayNameI18n'] is Map) {
       businessName = json['displayNameI18n']['en'] ?? json['displayNameI18n']['bn'] ?? '';
     }
     if (businessName.isEmpty) {
       businessName = json['name'] ?? '';
     }
+    if (legalName.isEmpty) {
+      legalName = businessName;
+    }
 
     return VendorProfileModel(
       id: json['id'] ?? '',
+      uniqueCode: json['uniqueCode']?.toString(),
+      legalName: legalName,
       businessName: businessName,
       tradeLicenseNo: json['tradeLicenseNo'] ?? '',
+      nidNo: json['nidNo']?.toString(),
+      nidPhotoKey: json['nidPhotoKey']?.toString(),
+      nidPhotoUrl: json['nidPhotoUrl']?.toString(),
+      logoKey: json['logoKey']?.toString(),
+      logoUrl: json['logoUrl']?.toString() ?? json['logoKey']?.toString(),
       contactPhone: json['contactPhone'] ?? json['phone'] ?? '',
       contactEmail: json['contactEmail'] ?? json['email'] ?? '',
       status: VendorStatus.fromString(json['status']),

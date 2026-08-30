@@ -79,12 +79,16 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
         if (!mounted) return;
         if (subProv.currentSubscription?.isActive == true) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
+            MaterialPageRoute(
+              builder: (_) => const VendorMainNavigationShell(),
+            ),
             (route) => false,
           );
         } else {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const SubscriptionScreen(canGoBack: false)),
+            MaterialPageRoute(
+              builder: (_) => const SubscriptionScreen(canGoBack: false),
+            ),
             (route) => false,
           );
         }

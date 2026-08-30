@@ -179,6 +179,64 @@ class VendorAuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateVendorProfile({
+    required String businessName,
+    required String contactPhone,
+    required String contactEmail,
+    required String tradeLicenseNo,
+    String? nidNo,
+    String? nidPhotoKey,
+    String? logoKey,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    String formattedPhone = contactPhone.trim();
+    if (formattedPhone.startsWith('01')) {
+      formattedPhone = '+88$formattedPhone';
+    } else if (formattedPhone.startsWith('8801')) {
+      formattedPhone = '+$formattedPhone';
+    }
+
+    try {
+      final body = <String, dynamic>{
+        'legalName': businessName.trim(),
+        'displayNameI18n': {
+          'en': businessName.trim(),
+          'bn': businessName.trim(),
+        },
+        'contactPhone': formattedPhone,
+        'contactEmail': contactEmail.trim().toLowerCase(),
+        'tradeLicenseNo': tradeLicenseNo.trim(),
+      };
+      if (nidNo != null && nidNo.trim().isNotEmpty) {
+        body['nidNo'] = nidNo.trim();
+      }
+      if (nidPhotoKey != null && nidPhotoKey.trim().isNotEmpty) {
+        body['nidPhotoKey'] = nidPhotoKey.trim();
+      }
+      if (logoKey != null && logoKey.trim().isNotEmpty) {
+        body['logoKey'] = logoKey.trim();
+      }
+
+      await _client.patch(
+        ApiEndpoints.vendorProfile,
+        body: body,
+      );
+
+      await fetchProfiles();
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     _token = null;
     _vendorProfile = null;

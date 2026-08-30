@@ -52,9 +52,28 @@ class ApiEndpoints {
 
   // Subscriptions
   static String get subscriptionPlans => '$baseUrl/subscriptions/plans';
+  static String get paymentChannels => '$baseUrl/subscriptions/payment-channels';
   static String get vendorSubscription => '$baseUrl/subscriptions/vendor/current';
   static String get choosePlan => '$baseUrl/subscriptions/vendor';
   static String submitSubscriptionPayment(String subscriptionId) => '$baseUrl/subscriptions/vendor/$subscriptionId/payments';
+
+  // Products & Catalogue
+  static String get products => '$baseUrl/vendor/products';
+  static String product(String id) => '$baseUrl/vendor/products/$id';
+  static String productImages(String id) => '$baseUrl/vendor/products/$id/images';
+  static String productVariants(String id) => '$baseUrl/vendor/products/$id/variants';
+  static String get categories => '$baseUrl/categories';
+
+  // Vendor Payout / Payment Receiving Methods
+  static String get vendorPayoutMethods => '$baseUrl/vendor/payout-methods';
+  static String vendorPayoutMethod(String id) => '$baseUrl/vendor/payout-methods/$id';
+
+  // Rider Self-Service
+  static String get riderAssignedDeliveries => '$baseUrl/rider/deliveries/assigned';
+  static String get riderAvailableDeliveries => '$baseUrl/rider/deliveries/available';
+  static String riderAcceptDelivery(String id) => '$baseUrl/rider/deliveries/$id/accept';
+  static String riderPickupDelivery(String id) => '$baseUrl/rider/deliveries/$id/pickup';
+  static String riderCompleteDelivery(String id) => '$baseUrl/rider/deliveries/$id/complete';
 
   // Notifications & Device Tokens
   static String get notifications => '$baseUrl/me/notifications';

@@ -39,18 +39,39 @@ class RiderProvider extends ChangeNotifier {
   Future<bool> addRider({
     required String fullName,
     required String phone,
+    String? photoKey,
+    String? nidNo,
+    String? nidPhotoKey,
   }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
+    String formattedPhone = phone.trim();
+    if (formattedPhone.startsWith('01')) {
+      formattedPhone = '+88$formattedPhone';
+    } else if (formattedPhone.startsWith('8801')) {
+      formattedPhone = '+$formattedPhone';
+    }
+
     try {
+      final body = <String, dynamic>{
+        'name': fullName.trim(),
+        'phone': formattedPhone,
+      };
+      if (photoKey != null && photoKey.trim().isNotEmpty) {
+        body['photoKey'] = photoKey.trim();
+      }
+      if (nidNo != null && nidNo.trim().isNotEmpty) {
+        body['nidNo'] = nidNo.trim();
+      }
+      if (nidPhotoKey != null && nidPhotoKey.trim().isNotEmpty) {
+        body['nidPhotoKey'] = nidPhotoKey.trim();
+      }
+
       await _client.post(
         ApiEndpoints.riders,
-        body: {
-          'fullName': fullName.trim(),
-          'phone': phone.trim(),
-        },
+        body: body,
       );
       await fetchRiders();
       return true;

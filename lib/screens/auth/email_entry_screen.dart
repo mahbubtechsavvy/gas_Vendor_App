@@ -5,7 +5,6 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/vendor_auth_provider.dart';
 import '../../widgets/custom_button.dart';
 import 'otp_verify_screen.dart';
-import 'vendor_register_screen.dart';
 
 class EmailEntryScreen extends StatefulWidget {
   const EmailEntryScreen({super.key});

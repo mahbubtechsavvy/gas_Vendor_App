@@ -19,11 +19,6 @@ class SubscriptionScreen extends StatefulWidget {
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
-  static const String _officialBkashNumber = '01644274016';
-  static const String _officialNagadNumber = '01644274016';
-  static const String _officialRocketNumber = '01644274016-8';
-  static const String _officialBankDetails = 'City Bank | A/C: 1102938475 | GT Group';
-
   @override
   void initState() {
     super.initState();
@@ -49,10 +44,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       ),
       builder: (ctx) => StatefulBuilder(
         builder: (modalCtx, setModalState) {
-          String accountNumber = _officialBkashNumber;
-          if (selectedMethod == 'NAGAD') accountNumber = _officialNagadNumber;
-          if (selectedMethod == 'ROCKET') accountNumber = _officialRocketNumber;
-          if (selectedMethod == 'BANK') accountNumber = _officialBankDetails;
+          final subProv = context.read<SubscriptionProvider>();
+          String accountNumber = subProv.bkashNumber;
+          if (selectedMethod == 'NAGAD') accountNumber = subProv.nagadNumber;
+          if (selectedMethod == 'ROCKET') accountNumber = subProv.rocketNumber;
+          if (selectedMethod == 'BANK') accountNumber = subProv.bankDetails;
 
           return Padding(
             padding: EdgeInsets.only(

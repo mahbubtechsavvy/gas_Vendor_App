@@ -96,16 +96,32 @@ class VendorOrderProvider extends ChangeNotifier {
     return _executeStateTransition(ApiEndpoints.readyOrder(orderId), orderId);
   }
 
-  Future<bool> dispatchOrder(String orderId, {String? riderId}) async {
+  Future<bool> dispatchOrder(
+    String orderId, {
+    String? riderId,
+    String deliveryType = 'STAFF_RIDER',
+  }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
       await _client.post(
-        ApiEndpoints.dispatchOrder(orderId),
-        body: riderId != null ? {'riderId': riderId} : null,
+        ApiEndpoints.assignDelivery,
+        body: {
+          'orderId': orderId,
+          if (riderId != null && riderId.isNotEmpty) 'riderId': riderId,
+          'deliveryType': deliveryType,
+        },
       );
+      await _client.post(
+        ApiEndpoints.dispatchOrder(orderId),
+        body: {
+          if (riderId != null && riderId.isNotEmpty) 'riderId': riderId,
+          'deliveryType': deliveryType,
+        },
+      ).catchError((_) => <String, dynamic>{});
+
       await fetchOrderDetails(orderId);
       await fetchOrders();
       return true;
