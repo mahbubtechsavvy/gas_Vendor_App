@@ -43,16 +43,24 @@ class VendorProfileModel {
   });
 
   factory VendorProfileModel.fromJson(Map<String, dynamic> json) {
+    String businessName = json['businessName'] ?? json['legalName'] ?? '';
+    if (businessName.isEmpty && json['displayNameI18n'] is Map) {
+      businessName = json['displayNameI18n']['en'] ?? json['displayNameI18n']['bn'] ?? '';
+    }
+    if (businessName.isEmpty) {
+      businessName = json['name'] ?? '';
+    }
+
     return VendorProfileModel(
       id: json['id'] ?? '',
-      businessName: json['businessName'] ?? json['name'] ?? '',
+      businessName: businessName,
       tradeLicenseNo: json['tradeLicenseNo'] ?? '',
       contactPhone: json['contactPhone'] ?? json['phone'] ?? '',
       contactEmail: json['contactEmail'] ?? json['email'] ?? '',
       status: VendorStatus.fromString(json['status']),
-      rejectionReason: json['rejectionReason'],
+      rejectionReason: json['rejectionReason'] ?? json['statusReason'],
       createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
+          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
     );
   }

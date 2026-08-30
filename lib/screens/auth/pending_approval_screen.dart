@@ -6,7 +6,9 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/branch_provider.dart';
 import '../../providers/vendor_auth_provider.dart';
 import '../../widgets/custom_button.dart';
+import '../../providers/subscription_provider.dart';
 import '../dashboard/vendor_main_navigation_shell.dart';
+import '../subscription/subscription_screen.dart';
 import 'email_entry_screen.dart';
 
 class PendingApprovalScreen extends StatefulWidget {
@@ -31,10 +33,21 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
     if (auth.vendorProfile?.status.isApproved == true) {
       await branchProv.fetchBranches();
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
-        (route) => false,
-      );
+      final subProv = context.read<SubscriptionProvider>();
+      await subProv.fetchSubscriptionData();
+      if (!mounted) return;
+
+      if (subProv.currentSubscription?.isActive == true) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
+          (route) => false,
+        );
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SubscriptionScreen(canGoBack: false)),
+          (route) => false,
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

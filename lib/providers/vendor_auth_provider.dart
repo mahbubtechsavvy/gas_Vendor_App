@@ -46,8 +46,6 @@ class VendorAuthProvider extends ChangeNotifier {
         ApiEndpoints.requestOtp,
         body: {
           'email': _pendingEmail,
-          'purpose': 'LOGIN',
-          'appType': 'VENDOR',
         },
       );
       _isLoading = false;
@@ -99,6 +97,8 @@ class VendorAuthProvider extends ChangeNotifier {
       if (res is Map<String, dynamic>) {
         if (res['vendor'] != null) {
           _vendorProfile = VendorProfileModel.fromJson(res['vendor']);
+        } else if (res['id'] != null && res['status'] != null) {
+          _vendorProfile = VendorProfileModel.fromJson(res);
         }
         if (res['staff'] != null) {
           _staffProfile = StaffModel.fromJson(res['staff']);
@@ -127,19 +127,37 @@ class VendorAuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
 
+    String formattedPhone = contactPhone.trim();
+    if (formattedPhone.startsWith('01')) {
+      formattedPhone = '+88$formattedPhone';
+    } else if (formattedPhone.startsWith('8801')) {
+      formattedPhone = '+$formattedPhone';
+    } else if (!formattedPhone.startsWith('+8801') && formattedPhone.isNotEmpty) {
+      formattedPhone = '+880$formattedPhone';
+    }
+
     try {
       final res = await _client.post(
         ApiEndpoints.vendorRegister,
         body: {
-          'businessName': businessName,
-          'tradeLicenseNo': tradeLicenseNo,
-          'contactPhone': contactPhone,
-          'contactEmail': contactEmail,
-          'initialBranch': {
-            'name': initialBranchName,
-            'address': branchAddress,
-            'thana': thana,
-            'district': district,
+          'legalName': businessName.trim(),
+          'displayNameI18n': {
+            'en': businessName.trim(),
+            'bn': businessName.trim(),
+          },
+          'tradeLicenseNo': tradeLicenseNo.trim(),
+          'contactPhone': formattedPhone,
+          'contactEmail': contactEmail.trim().toLowerCase(),
+          'primaryBranch': {
+            'nameI18n': {
+              'en': initialBranchName.trim().isNotEmpty ? initialBranchName.trim() : 'Main Branch',
+              'bn': initialBranchName.trim().isNotEmpty ? initialBranchName.trim() : 'প্রধান শাখা',
+            },
+            'phone': formattedPhone,
+            'addressLine': branchAddress.trim().isNotEmpty ? branchAddress.trim() : '$thana, $district',
+            'area': thana.trim().isNotEmpty ? thana.trim() : district.trim(),
+            'thana': thana.trim(),
+            'district': district.trim().isNotEmpty ? district.trim() : 'Dhaka',
           },
         },
       );

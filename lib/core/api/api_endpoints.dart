@@ -52,8 +52,9 @@ class ApiEndpoints {
 
   // Subscriptions
   static String get subscriptionPlans => '$baseUrl/subscriptions/plans';
-  static String get vendorSubscription => '$baseUrl/subscriptions/vendor';
-  static String submitSubscriptionPayment(String vendorId) => '$baseUrl/subscriptions/vendor/$vendorId/payments';
+  static String get vendorSubscription => '$baseUrl/subscriptions/vendor/current';
+  static String get choosePlan => '$baseUrl/subscriptions/vendor';
+  static String submitSubscriptionPayment(String subscriptionId) => '$baseUrl/subscriptions/vendor/$subscriptionId/payments';
 
   // Notifications & Device Tokens
   static String get notifications => '$baseUrl/me/notifications';

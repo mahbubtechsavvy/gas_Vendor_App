@@ -5,6 +5,7 @@ import '../../core/i18n/locale_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/vendor_auth_provider.dart';
 import '../auth/email_entry_screen.dart';
+import '../subscription/subscription_screen.dart';
 
 class VendorProfileScreen extends StatelessWidget {
   const VendorProfileScreen({super.key});
@@ -114,6 +115,18 @@ class VendorProfileScreen extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
+                    leading: const Icon(Icons.workspace_premium_outlined, color: AppTheme.primary),
+                    title: Text(loc.isBangla ? 'সাবস্ক্রিপশন ও প্ল্যান' : 'Subscription & Plans'),
+                    subtitle: Text(loc.isBangla ? 'প্ল্যান রিনিউ বা আপগ্রেড করুন' : 'Manage or upgrade partner plan'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textMuted),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const SubscriptionScreen(canGoBack: true)),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
                     leading: const Icon(Icons.language, color: AppTheme.primary),
                     title: Text(loc.isBangla ? 'ভাষা পরিবর্তন (Language)' : 'Language (ভাষা)'),
                     subtitle: Text(loc.isBangla ? 'বাংলা (Bangla)' : 'English'),
@@ -129,9 +142,9 @@ class VendorProfileScreen extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.headset_mic_outlined, color: AppTheme.primary),
                     title: Text(loc.tr('support')),
-                    subtitle: const Text('24/7 Helpline: +880 1700-000000'),
+                    subtitle: const Text('24/7 Helpline: 01644-274016'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textMuted),
-                    onTap: () => launchUrl(Uri.parse('tel:+8801700000000')),
+                    onTap: () => launchUrl(Uri.parse('tel:+8801644274016')),
                   ),
                 ],
               ),

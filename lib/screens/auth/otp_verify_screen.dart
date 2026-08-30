@@ -4,10 +4,13 @@ import 'package:provider/provider.dart';
 import '../../core/i18n/locale_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/branch_provider.dart';
+import '../../providers/subscription_provider.dart';
 import '../../providers/vendor_auth_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../dashboard/vendor_main_navigation_shell.dart';
+import '../subscription/subscription_screen.dart';
 import 'pending_approval_screen.dart';
+import 'vendor_register_screen.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   const OtpVerifyScreen({super.key});
@@ -61,7 +64,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
     if (success) {
       if (auth.vendorProfile == null) {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const VendorRegisterScreen()),
+          MaterialPageRoute(builder: (_) => VendorRegisterScreen()),
           (route) => false,
         );
       } else if (auth.vendorProfile?.status.isPending == true) {
@@ -71,18 +74,24 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
         );
       } else {
         await branchProv.fetchBranches();
+        final subProv = context.read<SubscriptionProvider>();
+        await subProv.fetchSubscriptionData();
         if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
-          (route) => false,
-        );
+        if (subProv.currentSubscription?.isActive == true) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const VendorMainNavigationShell()),
+            (route) => false,
+          );
+        } else {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const SubscriptionScreen(canGoBack: false)),
+            (route) => false,
+          );
+        }
       }
     } else if (auth.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(auth.error!),
-          backgroundColor: AppTheme.danger,
-        ),
+        SnackBar(content: Text(auth.error!), backgroundColor: AppTheme.danger),
       );
     }
   }
@@ -164,19 +173,26 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
-                    maxLength: 6,
+                    maxLength: 8,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 22,
+                      letterSpacing: 4,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 8,
                     ),
-                    decoration: const InputDecoration(
-                      hintText: '000000',
+                    decoration: InputDecoration(
                       counterText: '',
+                      hintText: 'Enter code',
+                      hintStyle: TextStyle(
+                        fontSize: 18,
+                        letterSpacing: 2,
+                        color: Colors.grey.shade400,
+                      ),
                     ),
                     validator: (val) {
-                      if (val == null || val.trim().length != 6) {
-                        return loc.isBangla ? '৬ ডিজিটের কোড দিন' : 'Please enter 6 digits';
+                      if (val == null ||
+                          val.trim().length < 6 ||
+                          val.trim().length > 8) {
+                        return loc.tr('invalidOtp');
                       }
                       return null;
                     },
@@ -194,7 +210,10 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                       if (_secondsRemaining > 0)
                         Text(
                           '${loc.tr('resendOtpIn')} $_secondsRemaining${loc.tr('seconds')}',
-                          style: const TextStyle(color: AppTheme.textMuted, fontSize: 14),
+                          style: const TextStyle(
+                            color: AppTheme.textMuted,
+                            fontSize: 14,
+                          ),
                         )
                       else
                         TextButton(

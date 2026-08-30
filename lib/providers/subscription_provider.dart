@@ -43,28 +43,50 @@ class SubscriptionProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> submitManualPayment({
-    required String vendorId,
-    required String planCode,
-    required String transactionId,
-    required String paymentMethod,
+  Future<bool> subscribeAndSubmitPayment({
+    required String planKey,
+    required String method,
+    required String senderPhone,
+    required String transactionRef,
     required int amountPaisa,
+    String? promoCode,
   }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await _client.post(
-        ApiEndpoints.submitSubscriptionPayment(vendorId),
+      // 1. Choose/Create subscription plan
+      final subRes = await _client.post(
+        ApiEndpoints.choosePlan,
         body: {
-          'planCode': planCode,
-          'trxId': transactionId.trim(),
-          'method': paymentMethod,
-          'amountPaisa': amountPaisa,
+          'planKey': planKey,
+          if (promoCode != null && promoCode.trim().isNotEmpty) 'promoCode': promoCode.trim(),
         },
       );
+
+      final subscriptionId = subRes is Map<String, dynamic>
+          ? (subRes['id']?.toString() ?? '')
+          : '';
+
+      if (subscriptionId.isEmpty) {
+        throw Exception('Failed to initialize subscription');
+      }
+
+      // 2. Submit payment proof
+      await _client.post(
+        ApiEndpoints.submitSubscriptionPayment(subscriptionId),
+        body: {
+          'method': method.toUpperCase(),
+          'transactionRef': transactionRef.trim(),
+          'amountPaisa': amountPaisa,
+          'proofKey': 'Sender: ${senderPhone.trim()}',
+        },
+      );
+
       await fetchSubscriptionData();
+      _isLoading = false;
+      notifyListeners();
       return true;
     } catch (e) {
       _isLoading = false;
@@ -72,5 +94,22 @@ class SubscriptionProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  Future<bool> submitManualPayment({
+    required String subscriptionId,
+    required String planCode,
+    required String transactionId,
+    required String paymentMethod,
+    required int amountPaisa,
+    String senderPhone = '',
+  }) async {
+    return subscribeAndSubmitPayment(
+      planKey: planCode,
+      method: paymentMethod,
+      senderPhone: senderPhone,
+      transactionRef: transactionId,
+      amountPaisa: amountPaisa,
+    );
   }
 }

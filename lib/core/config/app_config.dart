@@ -21,6 +21,6 @@ class AppConfig {
   static const String keyFcmToken = 'gl_vendor_fcm_token';
 
   // Request Timeouts
-  static const Duration connectTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
+  static const Duration connectTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(seconds: 30);
 }

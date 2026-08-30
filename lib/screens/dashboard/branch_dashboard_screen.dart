@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/vendor_order_model.dart';
 import '../../providers/branch_provider.dart';
 import '../../providers/inventory_provider.dart';
+import '../../providers/subscription_provider.dart';
 import '../../providers/vendor_auth_provider.dart';
 import '../../providers/vendor_order_provider.dart';
 import '../../widgets/branch_selector_modal.dart';
@@ -37,6 +38,9 @@ class _BranchDashboardScreenState extends State<BranchDashboardScreen> {
     final branchProv = context.read<BranchProvider>();
     final orderProv = context.read<VendorOrderProvider>();
     final invProv = context.read<InventoryProvider>();
+    final subProv = context.read<SubscriptionProvider>();
+
+    await subProv.fetchSubscriptionData();
 
     if (branchProv.currentBranchId != null) {
       await Future.wait([
@@ -53,6 +57,8 @@ class _BranchDashboardScreenState extends State<BranchDashboardScreen> {
     final branchProv = context.watch<BranchProvider>();
     final orderProv = context.watch<VendorOrderProvider>();
     final invProv = context.watch<InventoryProvider>();
+    final subProv = context.watch<SubscriptionProvider>();
+    final currentSub = subProv.currentSubscription;
 
     final branch = branchProv.selectedBranch;
     final pendingCount = orderProv.unacknowledgedPendingCount;
@@ -112,6 +118,69 @@ class _BranchDashboardScreenState extends State<BranchDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Subscription Inactive / Pending Payment Alert Banner
+              if (currentSub?.isActive != true) ...[
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFECACA), width: 1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEE2E2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626), size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.isBangla ? 'সাবস্ক্রিপশন প্ল্যান প্রয়োজন' : 'Subscription Inactive',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Color(0xFF991B1B),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              loc.isBangla
+                                  ? 'কাস্টমার অর্ডার পেতে প্ল্যান সক্রিয় করুন।'
+                                  : 'Activate a partner plan to accept orders.',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const SubscriptionScreen(canGoBack: true)),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFDC2626),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text(
+                          loc.isBangla ? 'প্ল্যান দেখুন' : 'View Plans',
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               // Branch Status Card (Open / Closed)
               Card(
                 child: Padding(
