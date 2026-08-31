@@ -163,35 +163,56 @@ class ApiClient {
   }
 
   dynamic _handleResponse(http.Response response) {
-    dynamic decoded;
+    dynamic decodedBody;
     try {
       if (response.body.isNotEmpty) {
-        decoded = jsonDecode(response.body);
+        decodedBody = jsonDecode(response.body);
       }
     } catch (e) {
       debugPrint('Failed to decode JSON: ${response.body}');
     }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return decoded;
+      return decodedBody;
     }
 
-    String message = 'Request failed (${response.statusCode})';
-    String? code;
+    String errorMessage = 'An unexpected error occurred';
+    String? errorCode;
     dynamic details;
 
-    if (decoded is Map<String, dynamic>) {
-      message = decoded['message']?.toString() ??
-          decoded['error']?.toString() ??
-          message;
-      code = decoded['code']?.toString() ?? decoded['statusCode']?.toString();
-      details = decoded['details'] ?? decoded['errors'];
+    if (decodedBody is Map<String, dynamic>) {
+      if (decodedBody['error'] is Map<String, dynamic>) {
+        final errMap = decodedBody['error'] as Map<String, dynamic>;
+        if (errMap['message'] is String && (errMap['message'] as String).isNotEmpty) {
+          errorMessage = errMap['message'] as String;
+        } else if (errMap['message'] is List) {
+          errorMessage = (errMap['message'] as List).join(', ');
+        }
+        errorCode = errMap['code']?.toString();
+      } else if (decodedBody['message'] is List) {
+        errorMessage = (decodedBody['message'] as List).join(', ');
+      } else if (decodedBody['message'] is String) {
+        errorMessage = decodedBody['message'];
+      } else if (decodedBody['error'] is String) {
+        errorMessage = decodedBody['error'];
+      }
+      errorCode ??= (decodedBody['code']?.toString() ?? decodedBody['statusCode']?.toString());
+      details = decodedBody['details'] ?? decodedBody['errors'];
+    } else if (decodedBody is String && decodedBody.isNotEmpty) {
+      errorMessage = decodedBody;
+    }
+
+    if (response.statusCode == 401) {
+      _storage.clearToken();
+      if (errorMessage == 'An unexpected error occurred' || errorMessage.contains('bearer token') || errorMessage.contains('signature')) {
+        errorMessage = 'Please sign in to continue';
+      }
     }
 
     throw ApiException(
-      message: message,
+      message: errorMessage,
       statusCode: response.statusCode,
-      code: code,
+      code: errorCode,
       details: details,
     );
   }
