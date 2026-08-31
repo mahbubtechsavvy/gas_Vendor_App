@@ -324,9 +324,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return RefreshIndicator(
+      onRefresh: _loadProducts,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 64),
         children: [
           const Icon(
             Icons.inventory_2_outlined,
@@ -334,25 +336,32 @@ class _ProductsScreenState extends State<ProductsScreen> {
             color: Color(0xFF94A3B8),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'No products in this list',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+          const Center(
+            child: Text(
+              'No products in this list',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+            ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Tap below to add your first cylinder product.',
-            style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+          const Center(
+            child: Text(
+              'Tap below to add your first cylinder product or pull down to refresh.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+            ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: _navigateToAddProduct,
-            icon: const Icon(Icons.add),
-            label: const Text('Add Cylinder Product'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF6600),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          Center(
+            child: ElevatedButton.icon(
+              onPressed: _navigateToAddProduct,
+              icon: const Icon(Icons.add),
+              label: const Text('Add Cylinder Product'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF6600),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ),
         ],

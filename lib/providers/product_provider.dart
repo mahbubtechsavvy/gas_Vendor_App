@@ -83,8 +83,16 @@ class ProductProvider with ChangeNotifier {
       } else if (res is Map<String, dynamic> && res['items'] is List) {
         _categories = (res['items'] as List).map((c) => ProductCategory.fromJson(c as Map<String, dynamic>)).toList();
       }
-      notifyListeners();
     } catch (_) {}
+    if (_categories.isEmpty) {
+      _categories = [
+        ProductCategory(id: 'cat_lpg_cylinders', name: 'LPG Cylinders', nameBn: 'এলপিজি সিলিন্ডার'),
+        ProductCategory(id: 'cat_regulators', name: 'Regulators & Safety', nameBn: 'রেগুলেটর ও নিরাপত্তা'),
+        ProductCategory(id: 'cat_accessories', name: 'Pipes & Accessories', nameBn: 'পাইপ ও এক্সেসরিজ'),
+        ProductCategory(id: 'cat_stoves', name: 'Gas Stoves & Burners', nameBn: 'গ্যাস চুলা'),
+      ];
+    }
+    notifyListeners();
   }
 
   // Create Product via NestJS API
