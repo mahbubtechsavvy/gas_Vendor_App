@@ -96,150 +96,308 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
     final auth = context.watch<VendorAuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text(loc.isBangla ? 'ভেন্ডর পার্টনার নিবন্ধন' : 'Vendor Registration'),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        title: Text(
+          loc.isBangla ? 'ভেন্ডর পার্টনার নিবন্ধন' : 'Vendor Partner Onboarding',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF0F172A),
+          ),
+        ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Business Information Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Top Welcome Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF7ED),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFFEDD5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6600),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.verified_outlined, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.isBangla ? 'ভেন্ডর পার্টনার ভেরিফিকেশন' : 'Distributor Verification',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFC2410C)),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              loc.isBangla
+                                  ? 'তথ্য জমা দেওয়ার পর অ্যাডমিন টিম ২৪ ঘণ্টার মধ্যে অনুমোদন করবে।'
+                                  : 'Admin reviews applications within 24h to activate nationwide selling.',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF9A3412)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Card 1: Business Profile
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        loc.isBangla ? 'ব্যবসায়িক তথ্য' : 'Business Information',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      const Row(
+                        children: [
+                          Icon(Icons.storefront_outlined, color: Color(0xFFFF6600), size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Business & License Profile',
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
+
+                      const Text('Business / Shop Name *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _businessNameController,
                         decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'প্রতিষ্ঠানের নাম' : 'Business / Enterprise Name',
-                          hintText: 'e.g. Dhaka Gas Agency',
-                          prefixIcon: const Icon(Icons.business_outlined),
+                          hintText: 'e.g. Mahbub Enterprise & Gas Agency',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
                         ),
-                        validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your business name' : null,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
+
+                      const Text('Trade License Number *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _tradeLicenseController,
                         decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'ট্রেড লাইসেন্স নম্বর' : 'Trade License Number',
-                          hintText: 'e.g. TRAD/DNCC/123456/2026',
-                          prefixIcon: const Icon(Icons.badge_outlined),
+                          hintText: 'e.g. TRAD/DNCC/012345/2026',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
                         ),
-                        validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your trade license number' : null,
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'অফিসিয়াল ইমেইল' : 'Official Business Email',
-                          hintText: 'contact@enterprise.com',
-                          prefixIcon: const Icon(Icons.email_outlined),
-                        ),
-                        validator: (val) {
-                          if (val == null || val.trim().isEmpty) return 'Required';
-                          if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val.trim())) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
-                        },
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Card 2: Contact Details
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.contact_phone_outlined, color: Color(0xFFFF6600), size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Owner & Direct Contact',
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
+
+                      const Text('Official Contact Phone *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'মালিক / ম্যানেজারের ফোন' : 'Contact Phone Number',
-                          hintText: '+8801700000000',
-                          prefixIcon: const Icon(Icons.phone_android),
+                          hintText: '017XXXXXXXX',
+                          prefixText: '+88 ',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
                         ),
-                        validator: (val) => val == null || val.trim().length < 11 ? 'Valid phone required' : null,
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your contact phone' : null,
+                      ),
+                      const SizedBox(height: 16),
+
+                      const Text('Official Email Address *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: 'vendor@example.com',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
+                        ),
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your email' : null,
                       ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 20),
 
-              const SizedBox(height: 16),
-
-              // Initial Branch Card
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                // Card 3: Depot Location
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        loc.isBangla ? 'প্রথম ব্রাঞ্চের বিবরণ' : 'Primary Branch Details',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      const Row(
+                        children: [
+                          Icon(Icons.warehouse_outlined, color: Color(0xFFFF6600), size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Main Distribution Branch / Depot',
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
+
+                      const Text('Branch Name *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
                       TextFormField(
                         controller: _branchNameController,
                         decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'ব্রাঞ্চের নাম' : 'Branch Name',
-                          hintText: 'e.g. Dhanmondi Outlet',
-                          prefixIcon: const Icon(Icons.storefront_outlined),
+                          hintText: 'e.g. Dhanmondi Main Depot',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
                         ),
-                        validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your branch name' : null,
                       ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _branchAddressController,
-                        maxLines: 2,
-                        decoration: InputDecoration(
-                          labelText: loc.isBangla ? 'পূর্ণ ঠিকানা' : 'Full Branch Address',
-                          hintText: 'Road 8A, House 24, Dhanmondi',
-                          prefixIcon: const Icon(Icons.location_on_outlined),
-                        ),
-                        validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
+
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              controller: _thanaController,
-                              decoration: const InputDecoration(labelText: 'Thana'),
-                              validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('District *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                                const SizedBox(height: 6),
+                                TextFormField(
+                                  controller: _districtController,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFFF8FAFC),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                                  ),
+                                  validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: TextFormField(
-                              controller: _districtController,
-                              decoration: const InputDecoration(labelText: 'District'),
-                              validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Thana / Area *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                                const SizedBox(height: 6),
+                                TextFormField(
+                                  controller: _thanaController,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFFF8FAFC),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                                  ),
+                                  validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+
+                      const Text('Store Address & Landmark *', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _branchAddressController,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          hintText: 'e.g. 42/A Mirpur Road, Near City Hospital',
+                          filled: true,
+                          fillColor: const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFF6600), width: 1.5)),
+                        ),
+                        validator: (val) => val == null || val.trim().isEmpty ? 'Please enter your branch address' : null,
+                      ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 24),
 
-              const SizedBox(height: 24),
-
-              CustomButton(
-                text: loc.isBangla ? 'আবেদন জমা দিন' : 'Submit Application',
-                isLoading: auth.isLoading,
-                onPressed: _submit,
-              ),
-
-              const SizedBox(height: 24),
-            ],
+                CustomButton(
+                  text: loc.isBangla ? 'ভেন্ডর আবেদন জমা দিন' : 'Submit Application for Review',
+                  isLoading: auth.isLoading,
+                  icon: Icons.send_rounded,
+                  onPressed: _submit,
+                ),
+              ],
+            ),
           ),
         ),
       ),

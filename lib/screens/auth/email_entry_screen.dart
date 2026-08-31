@@ -27,7 +27,7 @@ class _EmailEntryScreenState extends State<EmailEntryScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final auth = context.read<VendorAuthProvider>();
-    final email = _emailController.text.trim();
+    final email = _emailController.text.trim().toLowerCase();
 
     final success = await auth.requestOtp(email);
     if (!mounted) return;
@@ -52,16 +52,41 @@ class _EmailEntryScreenState extends State<EmailEntryScreen> {
     final auth = context.watch<VendorAuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
-          TextButton(
-            onPressed: () {
-              loc.setLocale(loc.isBangla ? 'en' : 'bn');
-            },
-            child: Text(
-              loc.isBangla ? 'English' : 'বাংলা',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                loc.setLocale(loc.isBangla ? 'en' : 'bn');
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.language, size: 16, color: Color(0xFFFF6600)),
+                    const SizedBox(width: 6),
+                    Text(
+                      loc.isBangla ? 'English' : 'বাংলা',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -69,106 +94,223 @@ class _EmailEntryScreenState extends State<EmailEntryScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Merchant Icon Header
                   Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.storefront,
-                        size: 48,
-                        color: AppTheme.primary,
-                      ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFFFF6600).withValues(alpha: 0.1),
+                          ),
+                        ),
+                        Container(
+                          width: 76,
+                          height: 76,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [Color(0xFFFF6600), Color(0xFFFF8C38)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x40FF6600),
+                                blurRadius: 20,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.storefront_rounded,
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 24),
+
+                  // Title & Subtitle
                   Text(
-                    loc.tr('loginTitle'),
+                    loc.isBangla ? 'ভেন্ডর পার্টনার পোর্টাল' : 'Vendor Partner Portal',
                     style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.5,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    loc.tr('loginSubtitle'),
+                    loc.isBangla
+                        ? 'এলপিজি গ্যাস সিলিন্ডার ডিস্ট্রিবিউশন ও সেলস ম্যানেজমেন্ট'
+                        : 'Official Management Console for LPG Cylinder Merchants & Distributors',
                     style: const TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.textSecondary,
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: loc.tr('emailLabel'),
-                      hintText: 'vendor@example.com',
-                      prefixIcon: const Icon(Icons.email_outlined),
+
+                  // Login Card
+                  Container(
+                    padding: const EdgeInsets.all(24.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                    validator: (val) {
-                      if (val == null || val.trim().isEmpty) {
-                        return 'Please enter your business email';
-                      }
-                      if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val.trim())) {
-                        return 'Please enter a valid email address';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  CustomButton(
-                    text: loc.tr('sendOtp'),
-                    isLoading: auth.isLoading,
-                    onPressed: _submit,
-                  ),
-                  const SizedBox(height: 28),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        loc.isBangla ? 'নতুন ভেন্ডর পার্টনার?' : 'New Vendor Partner?',
-                        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (_emailController.text.trim().isNotEmpty &&
-                              RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(_emailController.text.trim())) {
-                            _submit();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  loc.isBangla
-                                      ? 'নিবন্ধন শুরু করতে উপরে আপনার ব্যবসায়িক ইমেল লিখুন এবং কোড পাঠান।'
-                                      : 'Enter your business email above and click Send OTP to start registration.',
-                                ),
-                                backgroundColor: AppTheme.primary,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF7ED),
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                            );
-                          }
-                        },
-                        child: Text(
-                          loc.isBangla ? 'নিবন্ধন করুন' : 'Register Here',
+                              child: const Text(
+                                'MERCHANT ACCESS',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFFFF6600),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(Icons.verified_user_outlined, size: 14, color: Color(0xFF10B981)),
+                            const SizedBox(width: 4),
+                            const Text(
+                              'Verified Partner',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF10B981),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        Text(
+                          loc.isBangla ? 'ব্যবসায়িক ইমেইল অ্যাড্রেস *' : 'Registered Business Email *',
                           style: const TextStyle(
-                            color: AppTheme.accent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: Color(0xFF1E293B),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                            hintText: 'e.g. vendor@gaslagba.com',
+                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+                            prefixIcon: const Icon(Icons.business_outlined, color: Color(0xFF94A3B8), size: 20),
+                            filled: true,
+                            fillColor: const Color(0xFFF8FAFC),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Color(0xFFFF6600), width: 2),
+                            ),
+                          ),
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return 'Please enter your business email';
+                            }
+                            if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(val.trim())) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        CustomButton(
+                          text: loc.tr('sendOtp'),
+                          isLoading: auth.isLoading,
+                          icon: Icons.arrow_forward_rounded,
+                          onPressed: _submit,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Partner Onboarding Link
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF7ED),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.handshake_outlined, color: Color(0xFFFF6600), size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                loc.isBangla ? 'নতুন গ্যাস ডিলার বা ডিস্ট্রিবিউটর?' : 'Want to become a Gas Partner?',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF0F172A)),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                loc.isBangla ? 'আপনার ইমেইল লিখে ওটিপি কোড দিয়ে নিবন্ধন সম্পন্ন করুন।' : 'Enter your email above to begin instant partner onboarding.',
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

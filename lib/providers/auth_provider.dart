@@ -6,8 +6,6 @@ import '../models/vendor_status.dart';
 import '../services/auth_service.dart';
 import '../services/demo_data.dart';
 import '../config/api_config.dart';
-// DEV-LOGIN-BACKDOOR — remove with lib/dev/dev_login.dart.
-import '../dev/dev_login.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -158,29 +156,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  /// DEV-LOGIN-BACKDOOR — TEMPORARY. Saves a fabricated local session so the UI can be
-  /// browsed without a backend. Compiled out of release builds; see lib/dev/dev_login.dart.
-  Future<bool> devLogin() async {
-    if (!DevLogin.enabled) return false;
 
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
-    try {
-      final vendor = DevLogin.vendor();
-      await _authService.saveVendorData(vendor, DevLogin.token);
-      _vendor = vendor;
-      _isLoggedIn = true;
-      return true;
-    } catch (e) {
-      _error = e.toString().replaceAll('Exception: ', '');
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
 
   // Logout
   Future<void> logout() async {
