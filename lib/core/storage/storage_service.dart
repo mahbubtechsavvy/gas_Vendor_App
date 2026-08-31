@@ -57,4 +57,8 @@ class StorageService {
     await _prefs?.remove(AppConfig.keySelectedBranchId);
     await _prefs?.remove(AppConfig.keyUserRole);
   }
+
+  Future<void> clearToken() async {
+    await clearAuth();
+  }
 }

@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF003496);
-  static const Color primaryLight = Color(0xFFE6EEF9);
-  static const Color accent = Color(0xFFFF6600);
-  static const Color accentLight = Color(0xFFFFF0E6);
+  // Gas Lagba Luxe Partner Theme
+  static const Color primary = Color(0xFFFF6600);
+  static const Color primaryDark = Color(0xFFCC5200);
+  static const Color primaryLight = Color(0xFFFFF4ED);
+  static const Color accent = Color(0xFFFF9900);
+  static const Color accentLight = Color(0xFFFFF8EE);
 
   static const Color background = Color(0xFFF8FAFC);
   static const Color surface = Colors.white;
+  static const Color cardDark = Color(0xFF0F172A);
 
   static const Color success = Color(0xFF10B981);
-  static const Color successLight = Color(0xFFD1FAE5);
+  static const Color successLight = Color(0xFFECFDF5);
   static const Color warning = Color(0xFFF59E0B);
   static const Color warningLight = Color(0xFFFEF3C7);
   static const Color danger = Color(0xFFEF4444);
-  static const Color dangerLight = Color(0xFFFEE2E2);
+  static const Color dangerLight = Color(0xFFFEF2F2);
 
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF475569);

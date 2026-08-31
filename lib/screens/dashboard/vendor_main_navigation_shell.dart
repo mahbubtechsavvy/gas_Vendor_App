@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/i18n/locale_provider.dart';
-import '../../core/theme/app_theme.dart';
 import '../../providers/vendor_order_provider.dart';
+import '../../widgets/floating_pill_nav_bar.dart';
 import '../inventory/branch_inventory_screen.dart';
 import '../order/vendor_orders_screen.dart';
 import '../payouts/payout_ledger_screen.dart';
@@ -42,46 +42,38 @@ class _VendorMainNavigationShellState extends State<VendorMainNavigationShell> {
     ];
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
+      extendBody: true,
       body: screens[_currentIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        indicatorColor: AppTheme.primaryLight,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard, color: AppTheme.primary),
-            label: loc.tr('dashboard'),
+      bottomNavigationBar: FloatingPillNavBar(
+        currentIndex: _currentIndex,
+        onTap: (idx) => setState(() => _currentIndex = idx),
+        items: [
+          FloatingNavItem(
+            icon: Icons.dashboard_outlined,
+            activeIcon: Icons.dashboard_rounded,
+            label: loc.isBangla ? 'ড্যাশবোর্ড' : 'Dashboard',
           ),
-          NavigationDestination(
-            icon: Badge(
-              isLabelVisible: pendingCount > 0,
-              label: Text('$pendingCount'),
-              backgroundColor: AppTheme.accent,
-              child: const Icon(Icons.receipt_long_outlined),
-            ),
-            selectedIcon: Badge(
-              isLabelVisible: pendingCount > 0,
-              label: Text('$pendingCount'),
-              backgroundColor: AppTheme.accent,
-              child: const Icon(Icons.receipt_long, color: AppTheme.primary),
-            ),
-            label: loc.tr('orders'),
+          FloatingNavItem(
+            icon: Icons.receipt_long_outlined,
+            activeIcon: Icons.receipt_long_rounded,
+            label: loc.isBangla ? 'অর্ডার' : 'Orders',
+            badgeCount: pendingCount,
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.inventory_2_outlined),
-            selectedIcon: const Icon(Icons.inventory_2, color: AppTheme.primary),
-            label: loc.tr('inventory'),
+          FloatingNavItem(
+            icon: Icons.inventory_2_outlined,
+            activeIcon: Icons.inventory_2_rounded,
+            label: loc.isBangla ? 'স্টক' : 'Inventory',
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: const Icon(Icons.account_balance_wallet, color: AppTheme.primary),
-            label: loc.tr('payouts'),
+          FloatingNavItem(
+            icon: Icons.account_balance_wallet_outlined,
+            activeIcon: Icons.account_balance_wallet_rounded,
+            label: loc.isBangla ? 'আয়' : 'Payouts',
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person, color: AppTheme.primary),
-            label: loc.tr('profile'),
+          FloatingNavItem(
+            icon: Icons.person_outline_rounded,
+            activeIcon: Icons.person_rounded,
+            label: loc.isBangla ? 'প্রোফাইল' : 'Profile',
           ),
         ],
       ),
