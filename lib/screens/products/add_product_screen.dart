@@ -41,12 +41,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final categories = Provider.of<ProductProvider>(context, listen: false).categories;
-      if (categories.isNotEmpty) {
-        setState(() {
-          _selectedCategoryId = categories.first.id;
-        });
-      }
+      final provider = Provider.of<ProductProvider>(context, listen: false);
+      provider.fetchCategories().then((_) {
+        if (mounted && provider.categories.isNotEmpty && _selectedCategoryId == null) {
+          setState(() {
+            _selectedCategoryId = provider.categories.first.id;
+          });
+        }
+      });
     });
   }
 
@@ -176,6 +178,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
                         value: _selectedCategoryId ?? categories.first.id,
+                        isExpanded: true,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -184,7 +187,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         ),
                         items: categories.map((cat) {
-                          return DropdownMenuItem(value: cat.id, child: Text(cat.name));
+                          return DropdownMenuItem(value: cat.id, child: Text(cat.name, overflow: TextOverflow.ellipsis));
                         }).toList(),
                         onChanged: (val) {
                           setState(() {
@@ -200,6 +203,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       value: _selectedBrand,
+                      isExpanded: true,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -207,7 +211,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       ),
-                      items: _brands.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                      items: _brands.map((b) => DropdownMenuItem(value: b, child: Text(b, overflow: TextOverflow.ellipsis))).toList(),
                       onChanged: (val) {
                         if (val != null) {
                           setState(() {
@@ -265,6 +269,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               const SizedBox(height: 6),
                               DropdownButtonFormField<String>(
                                 value: _selectedSupplyType,
+                                isExpanded: true,
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white,
@@ -273,9 +278,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                 ),
                                 items: const [
-                                  DropdownMenuItem(value: 'REFILL', child: Text('Refill (Exchange)')),
-                                  DropdownMenuItem(value: 'NEW_CYLINDER', child: Text('New Package')),
-                                  DropdownMenuItem(value: 'STANDARD', child: Text('Standard')),
+                                  DropdownMenuItem(value: 'REFILL', child: Text('Refill (Exchange)', overflow: TextOverflow.ellipsis)),
+                                  DropdownMenuItem(value: 'NEW_CYLINDER', child: Text('New Package', overflow: TextOverflow.ellipsis)),
+                                  DropdownMenuItem(value: 'STANDARD', child: Text('Standard', overflow: TextOverflow.ellipsis)),
                                 ],
                                 onChanged: (val) {
                                   if (val != null) setState(() => _selectedSupplyType = val);
