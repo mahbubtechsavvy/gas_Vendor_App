@@ -77,213 +77,120 @@ class _VendorOrderDetailScreenState extends State<VendorOrderDetailScreen> {
     );
   }
 
-  void _showDispatchDialog(VendorOrderModel order) {
+  void _showCompleteDeliveryDialog(VendorOrderModel order) {
     final loc = context.read<LocaleProvider>();
-    final riderProv = context.read<RiderProvider>();
-    String selectedMode = 'STAFF_RIDER'; // 'SELF', 'STAFF_RIDER', 'PLATFORM_RIDER'
-    String? selectedRiderId = riderProv.riders.isNotEmpty ? riderProv.riders.first.id : null;
+    final otpController = TextEditingController();
+    final isCod = order.paymentMethod.toUpperCase() == 'COD';
 
     showDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Row(
-              children: [
-                const Icon(Icons.delivery_dining, color: AppTheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  loc.isBangla ? 'ডেলিভারি মাধ্যম নির্বাচন করুন' : 'Select Delivery Mode',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: AppTheme.success),
+            const SizedBox(width: 8),
+            Text(
+              loc.isBangla ? 'ডেলিভারি সম্পন্ন নিশ্চিতকরণ' : 'Confirm Handover & Delivery',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isCod ? const Color(0xFFFFFBEB) : const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isCod ? const Color(0xFFFDE68A) : const Color(0xFFBBF7D0),
+                ),
+              ),
+              child: Row(
                 children: [
-                  // Option 1: Deliver Myself
-                  ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: selectedMode == 'SELF' ? AppTheme.primary : Colors.black12,
-                        width: selectedMode == 'SELF' ? 2 : 1,
-                      ),
-                    ),
-                    tileColor: selectedMode == 'SELF' ? AppTheme.primary.withValues(alpha: 0.05) : null,
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFFFECE5),
-                      child: Icon(Icons.person_pin_circle, color: AppTheme.primary, size: 20),
-                    ),
-                    title: Text(
-                      loc.isBangla ? 'আমি নিজেই ডেলিভার করব' : 'Deliver Myself (Owner)',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                    subtitle: Text(
-                      loc.isBangla ? 'দোকানের মালিক সরাসরি গ্রাহককে ডেলিভার করবেন।' : 'Store owner delivers directly to customer.',
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                    ),
-                    trailing: Radio<String>(
-                      value: 'SELF',
-                      groupValue: selectedMode,
-                      activeColor: AppTheme.primary,
-                      onChanged: (val) => setModalState(() => selectedMode = val!),
-                    ),
-                    onTap: () => setModalState(() => selectedMode = 'SELF'),
+                  Icon(
+                    isCod ? Icons.payments_outlined : Icons.verified_outlined,
+                    color: isCod ? const Color(0xFFD97706) : const Color(0xFF16A34A),
+                    size: 24,
                   ),
-                  const SizedBox(height: 10),
-
-                  // Option 2: Staff Rider
-                  ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: selectedMode == 'STAFF_RIDER' ? AppTheme.primary : Colors.black12,
-                        width: selectedMode == 'STAFF_RIDER' ? 2 : 1,
-                      ),
-                    ),
-                    tileColor: selectedMode == 'STAFF_RIDER' ? AppTheme.primary.withValues(alpha: 0.05) : null,
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFE3F2FD),
-                      child: Icon(Icons.groups, color: Colors.blue, size: 20),
-                    ),
-                    title: Text(
-                      loc.isBangla ? 'আমার দোকানের স্টাফ রাইডার' : 'My In-House Staff Rider',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                    subtitle: Column(
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          loc.isBangla ? 'দোকানের নিয়োজিত রাইডারদের একজনকে দায়িত্ব দিন।' : 'Assign to an employed store rider.',
-                          style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                          isCod
+                              ? (loc.isBangla ? 'ক্যাশ অন ডেলিভারি (আদায়যোগ্য)' : 'Cash to Collect (COD)')
+                              : (loc.isBangla ? 'ডিজিটাল পেমেন্ট পরিশোধিত' : 'Paid in Full (Digital)'),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: isCod ? const Color(0xFF92400E) : const Color(0xFF15803D),
+                          ),
                         ),
-                        if (selectedMode == 'STAFF_RIDER') ...[
-                          const SizedBox(height: 8),
-                          if (riderProv.riders.isEmpty)
-                            Text(
-                              loc.isBangla ? 'কোনো অনুমোদিত রাইডার নেই।' : 'No approved riders found.',
-                              style: const TextStyle(fontSize: 11, color: AppTheme.danger, fontWeight: FontWeight.bold),
-                            )
-                          else
-                            DropdownButtonFormField<String>(
-                              initialValue: selectedRiderId,
-                              isDense: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Select Staff Rider',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: riderProv.riders.map((r) {
-                                return DropdownMenuItem(
-                                  value: r.id,
-                                  child: Text('${r.fullName} (${r.phone})', style: const TextStyle(fontSize: 12)),
-                                );
-                              }).toList(),
-                              onChanged: (val) => setModalState(() => selectedRiderId = val),
-                            ),
-                        ],
+                        const SizedBox(height: 2),
+                        Text(
+                          isCod ? order.total.format() : 'Paid Online',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isCod ? const Color(0xFFB45309) : const Color(0xFF166534),
+                          ),
+                        ),
                       ],
                     ),
-                    trailing: Radio<String>(
-                      value: 'STAFF_RIDER',
-                      groupValue: selectedMode,
-                      activeColor: AppTheme.primary,
-                      onChanged: (val) => setModalState(() => selectedMode = val!),
-                    ),
-                    onTap: () => setModalState(() => selectedMode = 'STAFF_RIDER'),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Option 3: Request Gas Lagba Central Rider
-                  ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: selectedMode == 'PLATFORM_RIDER' ? Colors.purple : Colors.black12,
-                        width: selectedMode == 'PLATFORM_RIDER' ? 2 : 1,
-                      ),
-                    ),
-                    tileColor: selectedMode == 'PLATFORM_RIDER' ? Colors.purple.withValues(alpha: 0.05) : null,
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFFF3E5F5),
-                      child: Icon(Icons.rocket_launch, color: Colors.purple, size: 20),
-                    ),
-                    title: Text(
-                      loc.isBangla ? 'গ্যাস লাগবা সেন্ট্রাল রাইডার' : 'Request Gas Lagba Rider',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.purple),
-                    ),
-                    subtitle: Text(
-                      loc.isBangla
-                          ? 'অর্ডারটি গ্যাস লাগবা অন-ডিমান্ড রাইডার পুলে যুক্ত হবে।'
-                          : 'Broadcast to Gas Lagba on-demand platform riders.',
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                    ),
-                    trailing: Radio<String>(
-                      value: 'PLATFORM_RIDER',
-                      groupValue: selectedMode,
-                      activeColor: Colors.purple,
-                      onChanged: (val) => setModalState(() => selectedMode = val!),
-                    ),
-                    onTap: () => setModalState(() => selectedMode = 'PLATFORM_RIDER'),
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(loc.tr('cancel')),
+            const SizedBox(height: 16),
+            Text(
+              loc.isBangla ? 'গ্রাহকের ৪-ডিজিটের হ্যান্ডওভার ওটিপি কোড:' : 'Customer 4-digit Handover OTP:',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 8),
+              decoration: InputDecoration(
+                hintText: '••••',
+                counterText: '',
+                filled: true,
+                fillColor: const Color(0xFFF8FAFC),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedMode == 'PLATFORM_RIDER' ? Colors.purple : AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: () async {
-                  if (selectedMode == 'STAFF_RIDER' && (selectedRiderId == null || riderProv.riders.isEmpty)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select an in-house staff rider or choose another option.')),
-                    );
-                    return;
-                  }
-
-                  Navigator.pop(ctx);
-                  final orderProv = context.read<VendorOrderProvider>();
-                  final ok = await orderProv.dispatchOrder(
-                    order.id,
-                    riderId: selectedMode == 'STAFF_RIDER' ? selectedRiderId : null,
-                    deliveryType: selectedMode,
-                  );
-
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          ok
-                              ? (selectedMode == 'PLATFORM_RIDER'
-                                  ? 'Gas Lagba rider requested! Broadcasted to platform.'
-                                  : 'Order dispatched successfully!')
-                              : (orderProv.error ?? 'Failed to dispatch order'),
-                        ),
-                        backgroundColor: ok ? AppTheme.success : AppTheme.danger,
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  selectedMode == 'PLATFORM_RIDER'
-                      ? (loc.isBangla ? 'রিকোয়েস্ট পাঠান' : 'Request Rider')
-                      : loc.tr('markDispatched'),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          );
-        },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(loc.tr('cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.success,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final orderProv = context.read<VendorOrderProvider>();
+              await orderProv.markDelivered(
+                order.id,
+                codCollected: true,
+                otp: otpController.text.trim(),
+              );
+            },
+            child: Text(loc.isBangla ? 'ডেলিভারি সম্পন্ন করুন' : 'Confirm Delivered'),
+          ),
+        ],
       ),
     );
   }
@@ -603,29 +510,39 @@ class _VendorOrderDetailScreenState extends State<VendorOrderDetailScreen> {
                   textColor: AppTheme.danger,
                   onPressed: () => _showRejectDialog(order),
                 ),
-              ] else if (order.status == VendorOrderStatus.accepted) ...[
+              ] else if (order.status == VendorOrderStatus.accepted ||
+                  order.status == VendorOrderStatus.preparing ||
+                  order.status == VendorOrderStatus.ready) ...[
                 CustomButton(
-                  text: loc.tr('markPreparing'),
-                  backgroundColor: const Color(0xFF4338CA),
-                  onPressed: () => orderProv.startPreparing(order.id),
-                ),
-              ] else if (order.status == VendorOrderStatus.preparing) ...[
-                CustomButton(
-                  text: loc.tr('markReady'),
-                  backgroundColor: const Color(0xFF6D28D9),
-                  onPressed: () => orderProv.markReady(order.id),
-                ),
-              ] else if (order.status == VendorOrderStatus.ready) ...[
-                CustomButton(
-                  text: loc.tr('markDispatched'),
+                  text: loc.isBangla ? '🚀 ডেলিভারির জন্য বের হোন (নিজস্ব ডেলিভারি)' : '🚀 Start Delivery (I am Delivering)',
                   backgroundColor: AppTheme.accent,
-                  onPressed: () => _showDispatchDialog(order),
+                  onPressed: () => orderProv.dispatchOrder(order.id, deliveryType: 'SELF'),
                 ),
               ] else if (order.status == VendorOrderStatus.outForDelivery) ...[
                 CustomButton(
-                  text: loc.tr('markDelivered'),
+                  text: loc.isBangla ? '✅ ডেলিভারি সম্পন্ন ও ওটিপি দিন' : '✅ Complete Delivery (Enter OTP)',
                   backgroundColor: AppTheme.success,
-                  onPressed: () => orderProv.markDelivered(order.id, codCollected: true),
+                  onPressed: () => _showCompleteDeliveryDialog(order),
+                ),
+              ] else if (order.status == VendorOrderStatus.delivered) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0FDF4),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFBBF7D0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.verified, color: Color(0xFF16A34A), size: 22),
+                      const SizedBox(width: 8),
+                      Text(
+                        loc.isBangla ? 'অর্ডারটি সফলভাবে ডেলিভারি সম্পন্ন হয়েছে' : 'Order Delivered Successfully',
+                        style: const TextStyle(color: Color(0xFF15803D), fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ],
 

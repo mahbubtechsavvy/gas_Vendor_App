@@ -133,15 +133,19 @@ class VendorOrderProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> markDelivered(String orderId, {bool codCollected = true}) async {
+  Future<bool> markDelivered(String orderId, {bool codCollected = true, String? otp}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
+      final Map<String, dynamic> body = {'codCashCollected': codCollected};
+      if (otp != null && otp.isNotEmpty) {
+        body['otp'] = otp;
+      }
       await _client.post(
         ApiEndpoints.deliverOrder(orderId),
-        body: {'codCashCollected': codCollected},
+        body: body,
       );
       await fetchOrderDetails(orderId);
       await fetchOrders();
