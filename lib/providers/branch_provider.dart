@@ -72,8 +72,12 @@ class BranchProvider extends ChangeNotifier {
           ? ApiEndpoints.openBranch(_selectedBranch!.id)
           : ApiEndpoints.closeBranch(_selectedBranch!.id);
 
-      await _client.post(url);
-      _selectedBranch = _selectedBranch!.copyWith(isOpen: open);
+      final res = await _client.post(url);
+      if (res is Map<String, dynamic> && res.containsKey('id')) {
+        _selectedBranch = BranchModel.fromJson(res);
+      } else {
+        _selectedBranch = _selectedBranch!.copyWith(isOpen: open);
+      }
 
       final idx = _branches.indexWhere((b) => b.id == _selectedBranch!.id);
       if (idx != -1) {
@@ -98,12 +102,21 @@ class BranchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _client.put(
+      final hoursJson = hours.toJson();
+      final res = await _client.put(
         ApiEndpoints.deliveryHours(_selectedBranch!.id),
-        body: {'schedule': hours.toJson()},
+        body: {
+          'hours': hoursJson,
+          'schedule': hoursJson,
+        },
       );
 
-      _selectedBranch = _selectedBranch!.copyWith(operatingHours: hours);
+      if (res is Map<String, dynamic> && res.containsKey('id')) {
+        _selectedBranch = BranchModel.fromJson(res);
+      } else {
+        _selectedBranch = _selectedBranch!.copyWith(operatingHours: hours);
+      }
+
       final idx = _branches.indexWhere((b) => b.id == _selectedBranch!.id);
       if (idx != -1) {
         _branches[idx] = _selectedBranch!;

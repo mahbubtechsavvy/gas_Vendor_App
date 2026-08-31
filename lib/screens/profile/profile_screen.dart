@@ -7,7 +7,7 @@ import '../../widgets/ui_components.dart';
 import '../../widgets/verification_badge.dart';
 import 'edit_profile_screen.dart';
 import '../analytics/business_analytics_screen.dart';
-import '../delivery_hours/delivery_hours_screen.dart';
+import '../delivery_hours/branch_delivery_hours_screen.dart';
 import '../subscription/subscription_screen.dart';
 import '../support/support_screen.dart';
 import '../../services/profile_service.dart';
@@ -162,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const DeliveryHoursScreen(),
+                        builder: (context) => const BranchDeliveryHoursScreen(),
                       ),
                     );
                   },
