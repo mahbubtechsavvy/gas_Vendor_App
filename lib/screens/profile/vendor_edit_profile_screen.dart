@@ -344,7 +344,7 @@ class _VendorEditProfileScreenState extends State<VendorEditProfileScreen> {
                                                     ),
                                                     fit: BoxFit.cover,
                                                     errorBuilder:
-                                                        (_, __, ___) =>
+                                                        (context, error, stackTrace) =>
                                                             const Icon(
                                                               Icons.storefront,
                                                               size: 40,
@@ -356,7 +356,7 @@ class _VendorEditProfileScreenState extends State<VendorEditProfileScreen> {
                                                     vendor.logoUrl!,
                                                     fit: BoxFit.cover,
                                                     errorBuilder:
-                                                        (_, __, ___) =>
+                                                        (context, error, stackTrace) =>
                                                             const Icon(
                                                               Icons.storefront,
                                                               size: 40,
@@ -620,13 +620,13 @@ class _VendorEditProfileScreenState extends State<VendorEditProfileScreen> {
                                                       .last,
                                                 ),
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) =>
+                                                errorBuilder: (context, error, stackTrace) =>
                                                     _buildNidPlaceholder(loc),
                                               )
                                             : Image.network(
                                                 vendor.nidPhotoUrl!,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) =>
+                                                errorBuilder: (context, error, stackTrace) =>
                                                     _buildNidPlaceholder(loc),
                                               ),
                                       )

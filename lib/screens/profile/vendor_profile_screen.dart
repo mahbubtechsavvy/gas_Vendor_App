@@ -107,7 +107,7 @@ class VendorProfileScreen extends StatelessWidget {
                                             vendor.logoUrl!.split(',').last,
                                           ),
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
+                                          errorBuilder: (context, error, stackTrace) =>
                                               const Icon(
                                                 Icons.storefront,
                                                 size: 36,
@@ -117,7 +117,7 @@ class VendorProfileScreen extends StatelessWidget {
                                       : Image.network(
                                           vendor.logoUrl!,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
+                                          errorBuilder: (context, error, stackTrace) =>
                                               const Icon(
                                                 Icons.storefront,
                                                 size: 36,
