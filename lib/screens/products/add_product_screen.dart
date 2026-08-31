@@ -184,7 +184,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       appBar: AppBar(
         title: const Text('Add Cylinder Product', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        foregroundColor: const Color(0xFF1E293B),
         elevation: 0.5,
       ),
       body: provider.isLoading
@@ -340,7 +340,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                                        decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
                                         child: const Icon(Icons.close, color: Colors.white, size: 16),
                                       ),
                                     ),
@@ -353,7 +353,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
                           // Brand presets picker
                           if (_showPresets) ...[
-                            const Text('Select an official brand cylinder graphic:', style: TextStyle(fontSize: 11, color: Colors.black54)),
+                            const Text('Select an official brand cylinder graphic:', style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
                             const SizedBox(height: 6),
                             SizedBox(
                               height: 90,

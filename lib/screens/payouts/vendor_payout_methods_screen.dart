@@ -27,7 +27,7 @@ class _VendorPayoutMethodsScreenState extends State<VendorPayoutMethodsScreen> {
       appBar: AppBar(
         title: const Text('Payment Receiving Accounts', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        foregroundColor: const Color(0xFF1E293B),
         elevation: 0.5,
         actions: [
           IconButton(

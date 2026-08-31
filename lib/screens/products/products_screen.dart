@@ -40,7 +40,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       appBar: AppBar(
         title: const Text('My Cylinder Products & Catalogue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        foregroundColor: const Color(0xFF1E293B),
         elevation: 0.5,
         actions: [
           IconButton(
@@ -148,11 +148,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
         style: TextStyle(
           fontSize: 12,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.white : Colors.black87,
+          color: isSelected ? Colors.white : const Color(0xFF334155),
         ),
       ),
       selected: isSelected,
-      selectedColor: color ?? const Color(0xFF003496),
+      selectedColor: color ?? const Color(0xFFFF6600),
       backgroundColor: const Color(0xFFF1F5F9),
       onSelected: (_) {
         setState(() {

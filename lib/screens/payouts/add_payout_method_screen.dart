@@ -73,7 +73,7 @@ class _AddPayoutMethodScreenState extends State<AddPayoutMethodScreen> {
       appBar: AppBar(
         title: const Text('Add Payment Receiving Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        foregroundColor: const Color(0xFF1E293B),
         elevation: 0.5,
       ),
       body: isLoading
