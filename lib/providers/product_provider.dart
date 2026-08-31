@@ -103,6 +103,7 @@ class ProductProvider with ChangeNotifier {
     String? descriptionEn,
     String? descriptionBn,
     String? brand,
+    String? photoUrl,
     String unit = 'KG',
     double cylinderSizeKg = 12.0,
     String supplyType = 'REFILL',
@@ -131,6 +132,7 @@ class ProductProvider with ChangeNotifier {
             'bn': descriptionBn?.trim() ?? nameBn?.trim() ?? nameEn.trim(),
           },
         if (brand != null && brand.trim().isNotEmpty) 'brand': brand.trim(),
+        if (photoUrl != null && photoUrl.trim().isNotEmpty) 'photoUrl': photoUrl.trim(),
         'unit': unit,
         'variants': [
           {
